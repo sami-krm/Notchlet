@@ -69,6 +69,7 @@ final class NotchWindowController: NSObject {
         panel.orderFrontRegardless()
         startMouseTracking()
         startSwipeTracking()
+        viewModel.startBatteryAlerts()
     }
 
     @objc private func applySettings() {

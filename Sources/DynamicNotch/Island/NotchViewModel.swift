@@ -19,9 +19,6 @@ final class NotchViewModel: NSObject, ObservableObject {
     let openTopRadius: CGFloat = 14
     let openBottomRadius: CGFloat = 26
 
-    /// Largeur ajoutée de chaque côté de l'encoche quand une "live activity" tourne.
-    let activityWing: CGFloat = 34
-
     let openSize = CGSize(width: 520, height: 180)
 
     private var transientTimer: Timer?
@@ -35,7 +32,7 @@ final class NotchViewModel: NSObject, ObservableObject {
 
     var closedSize: CGSize {
         var width = geometry.notchSize.width + 2 * closedTopRadius
-        if displayed != nil { width += 2 * activityWing }
+        if let displayed { width += 2 * displayed.closedWing }
         return CGSize(width: width, height: geometry.notchSize.height)
     }
 
@@ -50,7 +47,18 @@ final class NotchViewModel: NSObject, ObservableObject {
         media.track == nil ? nil : MusicActivity(media: media)
     }
 
+    /// Branche les alertes de batterie sur la file. Séparé de `init` pour que les tests
+    /// ne déclenchent ni alerte ni son selon l'état réel de la batterie.
+    func startBatteryAlerts() {
+        battery.onAlert = { [weak self] alert in
+            self?.enqueue(BatteryAlertActivity(alert: alert))
+        }
+        battery.update()
+    }
+
     func enqueue(_ activity: any Activity) {
+        // Brancher et débrancher plusieurs fois ne doit pas empiler la même alerte.
+        guard !transientQueue.contains(where: { $0.id == activity.id }) else { return }
         transientQueue.append(activity)
         if transientQueue.count == 1 { startTransientTimer() }
     }

@@ -10,6 +10,7 @@ Une « Dynamic Island » pour Mac, en Swift, SwiftUI et AppKit. Ce projet person
 - **Vue ouverte** : date, batterie, pochette, morceau en cours avec précédent / lecture-pause / suivant, barre de progression (clique ou fais-la glisser pour avancer ou reculer), et l'heure.
 - **Styles de couleur** : pochette (fond flou), coloré (couleur de la pochette sur l'égaliseur et la progression), dégradé (fond coloré), monochrome (noir et blanc).
 - **Gestes au trackpad**, à deux doigts sur l'île : vers le bas pour ouvrir, vers le haut pour fermer, vers la gauche pour le morceau suivant, vers la droite pour le précédent.
+- **Alertes de batterie** : quelques secondes dans l'île au branchement du chargeur et quand la batterie passe sous le seuil, avec un son (ceux de macOS). L'alerte s'affiche à la place de la musique, qui revient ensuite. Île ouverte, seul le son signale la batterie faible.
 - Une icône dans la barre des menus donne accès aux réglages et permet de quitter l'app.
 
 ## Réglages
@@ -21,6 +22,7 @@ Ouvre-les depuis l'icône de la barre des menus, avec **Réglages…**.
 - **Écran** : automatique (l'écran à encoche, sinon l'écran principal) ou un écran précis.
 - **Masquer l'île en plein écran** : activé par défaut. L'île disparaît des apps en plein écran au sens de macOS, c'est-à-dire qui occupent leur propre espace.
 - **Style de couleur** : dans l'onglet Lecture en cours.
+- **Alertes de batterie** : dans l'onglet Batterie, avec un seuil de 5 à 50 % (20 % par défaut) et un son désactivable.
 
 ## Permissions
 
@@ -30,7 +32,7 @@ Ouvre-les depuis l'icône de la barre des menus, avec **Réglages…**.
 
 macOS la demande dès le premier morceau détecté. Sans elle, l'île affiche l'icône de l'app au lieu de la pochette, sans barre de progression, et les boutons restent sans effet.
 
-Les gestes ne demandent aucune permission. Pour Spotify, la pochette est téléchargée depuis l'adresse HTTPS fournie par l'app.
+Les gestes et les alertes de batterie ne demandent aucune permission. Pour Spotify, la pochette est téléchargée depuis l'adresse HTTPS fournie par l'app.
 
 ## Lancer le projet
 

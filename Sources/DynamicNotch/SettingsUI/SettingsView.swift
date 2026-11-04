@@ -8,6 +8,8 @@ struct SettingsView: View {
                 .tabItem { Label("Général", systemImage: "gearshape") }
             NowPlayingSettingsView()
                 .tabItem { Label("Lecture en cours", systemImage: "music.note") }
+            BatterySettingsView()
+                .tabItem { Label("Batterie", systemImage: "battery.75") }
             AboutView()
                 .tabItem { Label("À propos", systemImage: "info.circle") }
         }
@@ -70,6 +72,33 @@ private struct NowPlayingSettingsView: View {
             Section("Gestes au trackpad, à deux doigts sur l'île") {
                 LabeledContent("Vers le bas ou le haut", value: "Ouvrir ou fermer")
                 LabeledContent("Vers la gauche ou la droite", value: "Morceau suivant ou précédent")
+            }
+        }
+        .formStyle(.grouped)
+    }
+}
+
+private struct BatterySettingsView: View {
+    @AppStorage(SettingsKey.chargeAlertEnabled) private var chargeAlertEnabled = true
+    @AppStorage(SettingsKey.lowBatteryAlertEnabled) private var lowAlertEnabled = true
+    @AppStorage(SettingsKey.lowBatteryThreshold) private var threshold = 20
+    @AppStorage(SettingsKey.lowBatterySoundEnabled) private var soundEnabled = true
+
+    var body: some View {
+        Form {
+            Section("Charge") {
+                Toggle("Alerter au branchement du chargeur", isOn: $chargeAlertEnabled)
+            }
+            Section("Batterie faible") {
+                Toggle("Alerter quand la batterie est faible", isOn: $lowAlertEnabled)
+                LabeledContent("Seuil : \(threshold) %") {
+                    // `Slider` travaille avec des nombres décimaux, le réglage est un entier.
+                    Slider(value: Binding(get: { Double(threshold) }, set: { threshold = Int($0) }),
+                           in: 5...50, step: 5)
+                }
+                .disabled(!lowAlertEnabled)
+                Toggle("Jouer un son", isOn: $soundEnabled)
+                    .disabled(!lowAlertEnabled)
             }
         }
         .formStyle(.grouped)

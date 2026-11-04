@@ -34,13 +34,14 @@ Sources/DynamicNotch/
     Activity.swift              Protocole commun des activités
     MusicActivity.swift         Morceau en cours dans l'île fermée, barre de progression
     MusicColorStyle.swift       Styles de couleur, pochette et fond de l'île
+    BatteryAlertActivity.swift  Alertes de charge et de batterie faible
   Managers/
     MediaManager.swift          Musique (notifications Spotify/Musique, AppleScript via osascript, hors du thread principal)
-    BatteryManager.swift        Batterie (IOKit)
+    BatteryManager.swift        Batterie (IOKit, notifications d'alimentation), décision des alertes
     LaunchAtLoginManager.swift  Lancement à l'ouverture de session (SMAppService)
   SettingsUI/
     SettingsWindowController.swift Fenêtre de réglages (NSWindow)
-    SettingsView.swift          Onglets Général, Lecture en cours et À propos
+    SettingsView.swift          Onglets Général, Lecture en cours, Batterie et À propos
 Tests/DynamicNotchTests/        Tests unitaires
 ```
 Dossier à créer quand il servira : `Private/` (API privées, chaque fonction désactivable). Un onglet de réglages s'ajoute avec la fonctionnalité qu'il règle.
