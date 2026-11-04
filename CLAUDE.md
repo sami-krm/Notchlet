@@ -1,22 +1,22 @@
-# Instructions du projet DynamicNotch
+# Instructions du projet Notchlet
 
 ## Le projet
-DynamicNotch est une « Dynamic Island » pour Mac, développée par un étudiant en BUT pour apprendre et pour une diffusion publique.
+Notchlet est une « Dynamic Island » pour Mac, développée par un étudiant en BUT pour apprendre et pour une diffusion publique.
 Le modèle de référence est **Alcove 1.7.7** (tryalcove.com). Objectif à terme : reproduire toutes ses fonctionnalités, puis aller au-delà.
 Le développement et les tests se font sur un MacBook avec Xcode.
-Diffusion : code public sur GitHub, téléchargements via GitHub Releases, sans compte développeur Apple pour l'instant (donc sans notarisation ni WeatherKit).
+Diffusion : code public sur GitHub sous licence MIT, téléchargements via GitHub Releases, sans compte développeur Apple pour l'instant (donc sans notarisation ni WeatherKit). Le paquet se construit avec `scripts/build-release.sh`, en signature ad hoc : ne jamais y mettre un certificat personnel, qui exposerait son adresse e-mail.
 Priorités : musique, HUD volume et luminosité, batterie et AirPods. API publiques d'abord ; les API privées arrivent en dernier, isolées et désactivables. Exception validée : la luminosité du HUD utilise déjà DisplayServices, faute d'API publique.
 
 ## Stack technique (à respecter)
 - **Langage** : Swift 5.9+ (mode de langage Swift 5 tant que le projet n'est pas migré vers Swift 6).
 - **UI** : SwiftUI pour toutes les vues. AppKit seulement pour la fenêtre (`NSPanel`), la barre des menus et ce que SwiftUI ne sait pas faire.
 - **Cible** : macOS 13 minimum. Une fonctionnalité qui exige macOS 14 ou 15 passe derrière `if #available`.
-- **Projet** : projet Xcode « macOS App » (`DynamicNotch.xcodeproj`), signature locale ad hoc. Les fichiers ajoutés dans `Sources/` et `Tests/` sont pris en compte automatiquement.
+- **Projet** : projet Xcode « macOS App » (`Notchlet.xcodeproj`), signature locale ad hoc. Les fichiers ajoutés dans `Sources/` et `Tests/` sont pris en compte automatiquement.
 - **Dépendances** : aucune, sauf accord explicite. Frameworks Apple uniquement.
 
 ## Architecture
 ```
-Sources/DynamicNotch/
+Sources/Notchlet/
   App/
     main.swift                  Point d'entrée, app "accessoire" (pas d'icône dans le Dock)
     AppDelegate.swift           Démarrage, icône de la barre des menus, changements d'écran
@@ -49,7 +49,7 @@ Sources/DynamicNotch/
   SettingsUI/
     SettingsWindowController.swift Fenêtre de réglages (NSWindow)
     SettingsView.swift          Onglets Général, HUD, Lecture en cours, Batterie, Bluetooth et À propos
-Tests/DynamicNotchTests/        Tests unitaires
+Tests/NotchletTests/        Tests unitaires
 ```
 `Private/` regroupe le code des API privées : chaque fonction est désactivable et laisse macOS reprendre la main si l'API disparaît. Un onglet de réglages s'ajoute avec la fonctionnalité qu'il règle.
 La signature de développement est dans `Config/Signing.xcconfig` (ad hoc par défaut). Le certificat et l'identifiant d'équipe restent dans `Config/Signing.local.xcconfig`, ignoré par Git : ils ne doivent pas arriver dans le dépôt public.

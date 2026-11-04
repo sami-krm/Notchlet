@@ -1,5 +1,5 @@
 import XCTest
-@testable import DynamicNotch
+@testable import Notchlet
 
 @MainActor
 final class HUDTests: XCTestCase {

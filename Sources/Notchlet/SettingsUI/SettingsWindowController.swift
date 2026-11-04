@@ -25,7 +25,7 @@ final class SettingsWindowController {
 
     private func makeWindow() -> NSWindow {
         let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(hud: hud, bluetooth: bluetooth)))
-        window.title = "Réglages de DynamicNotch"
+        window.title = "Réglages de Notchlet"
         window.styleMask = [.titled, .closable]
         // La fenêtre fermée reste en mémoire pour être rouverte.
         window.isReleasedWhenClosed = false

@@ -1,6 +1,21 @@
-# DynamicNotch
+# Notchlet
 
 Une « Dynamic Island » pour Mac, en Swift, SwiftUI et AppKit. Ce projet personnel est inspiré d'Alcove, sans en reprendre le code ni les ressources.
+
+## Installation
+
+Il faut macOS 13 ou plus récent. L'app a été testée sur macOS 15 avec un Mac Apple Silicon à encoche.
+
+1. Télécharge `Notchlet-x.y.z.zip` depuis la page [Releases](../../releases).
+2. Ouvre le zip et place `Notchlet.app` dans le dossier Applications.
+3. Ouvre l'app : macOS refuse d'abord, car elle n'est pas notarisée par Apple (cela demande un compte développeur payant).
+4. Va dans Réglages Système > Confidentialité et sécurité, descends jusqu'à la section Sécurité, puis clique sur **Ouvrir quand même** et confirme.
+
+L'app n'a pas d'icône dans le Dock : cherche son icône dans la barre des menus, en forme de pilule.
+
+Ouvre l'app seulement si tu fais confiance à sa source : télécharge-la depuis cette page, et lis le code si tu veux vérifier ce qu'elle fait.
+
+**Mise à jour :** remplace l'ancienne app dans Applications. macOS peut te redemander les permissions. Si le HUD ne répond plus alors que Notchlet paraît déjà autorisé, retire-le de la liste Accessibilité avec le bouton −, puis ajoute-le de nouveau.
 
 ## Ce que fait l'app
 
@@ -35,23 +50,23 @@ Ouvre-les depuis l'icône de la barre des menus, avec **Réglages…**.
 | Accessibilité | Intercepter les touches de volume et de luminosité pour le HUD | Réglages Système > Confidentialité et sécurité > Accessibilité |
 | Bluetooth | Détecter la connexion des appareils | Réglages Système > Confidentialité et sécurité > Bluetooth |
 
-macOS la demande dès le premier morceau détecté. Sans elle, l'île affiche l'icône de l'app au lieu de la pochette, sans barre de progression, et les boutons restent sans effet.
+L'Automatisation est demandée dès le premier morceau détecté. Sans elle, l'île affiche l'icône de l'app au lieu de la pochette, sans barre de progression, et les boutons restent sans effet.
 
 L'Accessibilité n'est demandée que lorsque tu actives le HUD, et le Bluetooth lorsque tu actives son onglet. La batterie des appareils vient de l'outil système `system_profiler`, sans API privée, mais son format n'est pas documenté. Les gestes et les alertes de batterie ne demandent aucune permission.
 
-**API privée :** le HUD de luminosité utilise DisplayServices, une API non documentée d'Apple (voir `Sources/DynamicNotch/Private`). Si une mise à jour de macOS la retire, ces touches reviennent à macOS. Pour Spotify, la pochette est téléchargée depuis l'adresse HTTPS fournie par l'app.
+**API privée :** le HUD de luminosité utilise DisplayServices, une API non documentée d'Apple (voir `Sources/Notchlet/Private`). Si une mise à jour de macOS la retire, ces touches reviennent à macOS. Pour Spotify, la pochette est téléchargée depuis l'adresse HTTPS fournie par l'app.
 
 ## Lancer le projet
 
 Il faut macOS 13 ou plus récent pour lancer l'app, et Xcode 16 ou plus récent pour la compiler.
 
-1. Ouvre `DynamicNotch.xcodeproj` dans Xcode.
-2. Choisis le schéma `DynamicNotch` > `My Mac`, puis ⌘R.
+1. Ouvre `Notchlet.xcodeproj` dans Xcode.
+2. Choisis le schéma `Notchlet` > `My Mac`, puis ⌘R.
 
 Pour lancer les tests : ⌘U dans Xcode, ou dans le Terminal :
 
 ```bash
-xcodebuild test -project DynamicNotch.xcodeproj -scheme DynamicNotch -destination 'platform=macOS'
+xcodebuild test -project Notchlet.xcodeproj -scheme Notchlet -destination 'platform=macOS'
 ```
 
 Le projet compile sans compte Apple, avec une signature ad hoc, mais macOS peut alors redemander l'Accessibilité après chaque compilation. Pour l'éviter, signe avec ton certificat en suivant les indications de `Config/Signing.xcconfig`.
@@ -60,13 +75,25 @@ Le projet compile sans compte Apple, avec une signature ad hoc, mais macOS peut 
 
 | Dossier | Rôle |
 |---|---|
-| `Sources/DynamicNotch/App` | Démarrage, barre des menus, clés de réglages |
-| `Sources/DynamicNotch/Window` | Fenêtre transparente, survol, taille de l'encoche |
-| `Sources/DynamicNotch/Island` | État, forme et interface de l'île |
-| `Sources/DynamicNotch/Activities` | Protocole `Activity` et activités affichées dans l'île |
-| `Sources/DynamicNotch/Managers` | Accès au système : musique, batterie, HUD, sortie audio, Bluetooth, lancement à l'ouverture de session |
-| `Sources/DynamicNotch/Private` | Code qui dépend d'API privées d'Apple |
-| `Sources/DynamicNotch/SettingsUI` | Fenêtre et onglets de réglages |
-| `Tests/DynamicNotchTests` | Tests unitaires |
+| `Sources/Notchlet/App` | Démarrage, barre des menus, clés de réglages |
+| `Sources/Notchlet/Window` | Fenêtre transparente, survol, taille de l'encoche |
+| `Sources/Notchlet/Island` | État, forme et interface de l'île |
+| `Sources/Notchlet/Activities` | Protocole `Activity` et activités affichées dans l'île |
+| `Sources/Notchlet/Managers` | Accès au système : musique, batterie, HUD, sortie audio, Bluetooth, lancement à l'ouverture de session |
+| `Sources/Notchlet/Private` | Code qui dépend d'API privées d'Apple |
+| `Sources/Notchlet/SettingsUI` | Fenêtre et onglets de réglages |
+| `Tests/NotchletTests` | Tests unitaires |
 
 Une activité brève (HUD, alerte) remplace l'activité de fond quelques secondes, puis celle-ci revient.
+
+## Construire le paquet
+
+```bash
+./scripts/build-release.sh
+```
+
+Le script crée `build/Notchlet-x.y.z.zip` et vérifie l'identifiant, les architectures et la signature ad hoc.
+
+## Licence
+
+Notchlet est distribué sous [licence MIT](LICENSE).

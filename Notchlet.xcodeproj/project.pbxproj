@@ -12,25 +12,25 @@
 			containerPortal = A10000000000000000000001 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = A10000000000000000000002;
-			remoteInfo = DynamicNotch;
+			remoteInfo = Notchlet;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		A10000000000000000000020 /* DynamicNotch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DynamicNotch.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		A10000000000000000000021 /* DynamicNotchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DynamicNotchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000020 /* Notchlet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Notchlet.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000021 /* NotchletTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NotchletTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000022 /* Config/Signing.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config/Signing.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A10000000000000000000030 /* Sources/DynamicNotch */ = {
+		A10000000000000000000030 /* Sources/Notchlet */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Sources/DynamicNotch;
+			path = Sources/Notchlet;
 			sourceTree = "<group>";
 		};
-		A10000000000000000000031 /* Tests/DynamicNotchTests */ = {
+		A10000000000000000000031 /* Tests/NotchletTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Tests/DynamicNotchTests;
+			path = Tests/NotchletTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -56,8 +56,8 @@
 		A10000000000000000000050 = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000030 /* Sources/DynamicNotch */,
-				A10000000000000000000031 /* Tests/DynamicNotchTests */,
+				A10000000000000000000030 /* Sources/Notchlet */,
+				A10000000000000000000031 /* Tests/NotchletTests */,
 				A10000000000000000000022 /* Config/Signing.xcconfig */,
 				A10000000000000000000051 /* Products */,
 			);
@@ -66,8 +66,8 @@
 		A10000000000000000000051 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				A10000000000000000000020 /* DynamicNotch.app */,
-				A10000000000000000000021 /* DynamicNotchTests.xctest */,
+				A10000000000000000000020 /* Notchlet.app */,
+				A10000000000000000000021 /* NotchletTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -75,9 +75,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		A10000000000000000000002 /* DynamicNotch */ = {
+		A10000000000000000000002 /* Notchlet */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A10000000000000000000070 /* Build configuration list for PBXNativeTarget "DynamicNotch" */;
+			buildConfigurationList = A10000000000000000000070 /* Build configuration list for PBXNativeTarget "Notchlet" */;
 			buildPhases = (
 				A10000000000000000000060 /* Sources */,
 				A10000000000000000000040 /* Frameworks */,
@@ -88,16 +88,16 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				A10000000000000000000030 /* Sources/DynamicNotch */,
+				A10000000000000000000030 /* Sources/Notchlet */,
 			);
-			name = DynamicNotch;
-			productName = DynamicNotch;
-			productReference = A10000000000000000000020 /* DynamicNotch.app */;
+			name = Notchlet;
+			productName = Notchlet;
+			productReference = A10000000000000000000020 /* Notchlet.app */;
 			productType = "com.apple.product-type.application";
 		};
-		A10000000000000000000003 /* DynamicNotchTests */ = {
+		A10000000000000000000003 /* NotchletTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = A10000000000000000000071 /* Build configuration list for PBXNativeTarget "DynamicNotchTests" */;
+			buildConfigurationList = A10000000000000000000071 /* Build configuration list for PBXNativeTarget "NotchletTests" */;
 			buildPhases = (
 				A10000000000000000000061 /* Sources */,
 				A10000000000000000000041 /* Frameworks */,
@@ -109,11 +109,11 @@
 				A10000000000000000000011 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				A10000000000000000000031 /* Tests/DynamicNotchTests */,
+				A10000000000000000000031 /* Tests/NotchletTests */,
 			);
-			name = DynamicNotchTests;
-			productName = DynamicNotchTests;
-			productReference = A10000000000000000000021 /* DynamicNotchTests.xctest */;
+			name = NotchletTests;
+			productName = NotchletTests;
+			productReference = A10000000000000000000021 /* NotchletTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
@@ -135,7 +135,7 @@
 					};
 				};
 			};
-			buildConfigurationList = A10000000000000000000072 /* Build configuration list for PBXProject "DynamicNotch" */;
+			buildConfigurationList = A10000000000000000000072 /* Build configuration list for PBXProject "Notchlet" */;
 			developmentRegion = fr;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -149,8 +149,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				A10000000000000000000002 /* DynamicNotch */,
-				A10000000000000000000003 /* DynamicNotchTests */,
+				A10000000000000000000002 /* Notchlet */,
+				A10000000000000000000003 /* NotchletTests */,
 			);
 		};
 /* End PBXProject section */
@@ -192,7 +192,7 @@
 /* Begin PBXTargetDependency section */
 		A10000000000000000000011 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = A10000000000000000000002 /* DynamicNotch */;
+			target = A10000000000000000000002 /* Notchlet */;
 			targetProxy = A10000000000000000000010 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -299,15 +299,15 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "DynamicNotch contrôle la lecture de Spotify et de Musique depuis l'île.";
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "DynamicNotch affiche dans l'île les appareils Bluetooth qui se connectent, avec leur batterie.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Notchlet contrôle la lecture de Spotify et de Musique depuis l'île.";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Notchlet affiche dans l'île les appareils Bluetooth qui se connectent, avec leur batterie.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.samikrim.DynamicNotch;
+				PRODUCT_BUNDLE_IDENTIFIER = com.samikrim.Notchlet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -321,15 +321,15 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSAppleEventsUsageDescription = "DynamicNotch contrôle la lecture de Spotify et de Musique depuis l'île.";
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "DynamicNotch affiche dans l'île les appareils Bluetooth qui se connectent, avec leur batterie.";
+				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Notchlet contrôle la lecture de Spotify et de Musique depuis l'île.";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Notchlet affiche dans l'île les appareils Bluetooth qui se connectent, avec leur batterie.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.samikrim.DynamicNotch;
+				PRODUCT_BUNDLE_IDENTIFIER = com.samikrim.Notchlet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -343,9 +343,9 @@
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.samikrim.DynamicNotchTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.samikrim.NotchletTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DynamicNotch.app/Contents/MacOS/DynamicNotch";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Notchlet.app/Contents/MacOS/Notchlet";
 			};
 			name = Debug;
 		};
@@ -358,16 +358,16 @@
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 0.1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.samikrim.DynamicNotchTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.samikrim.NotchletTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DynamicNotch.app/Contents/MacOS/DynamicNotch";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Notchlet.app/Contents/MacOS/Notchlet";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		A10000000000000000000070 /* Build configuration list for PBXNativeTarget "DynamicNotch" */ = {
+		A10000000000000000000070 /* Build configuration list for PBXNativeTarget "Notchlet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A10000000000000000000082 /* Debug */,
@@ -376,7 +376,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A10000000000000000000071 /* Build configuration list for PBXNativeTarget "DynamicNotchTests" */ = {
+		A10000000000000000000071 /* Build configuration list for PBXNativeTarget "NotchletTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A10000000000000000000084 /* Debug */,
@@ -385,7 +385,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A10000000000000000000072 /* Build configuration list for PBXProject "DynamicNotch" */ = {
+		A10000000000000000000072 /* Build configuration list for PBXProject "Notchlet" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A10000000000000000000080 /* Debug */,

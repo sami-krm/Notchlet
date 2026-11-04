@@ -36,14 +36,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Petite icône dans la barre des menus : réglages et sortie de l'app.
     private func setupStatusItem() {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
-        item.button?.image = NSImage(systemSymbolName: "capsule.fill", accessibilityDescription: "DynamicNotch")
+        item.button?.image = NSImage(systemSymbolName: "capsule.fill", accessibilityDescription: "Notchlet")
 
         let menu = NSMenu()
         let settingsItem = NSMenuItem(title: "Réglages…", action: #selector(openSettings), keyEquivalent: ",")
         settingsItem.target = self
         menu.addItem(settingsItem)
         menu.addItem(.separator())
-        menu.addItem(NSMenuItem(title: "Quitter DynamicNotch",
+        menu.addItem(NSMenuItem(title: "Quitter Notchlet",
                                 action: #selector(NSApplication.terminate(_:)),
                                 keyEquivalent: "q"))
         item.menu = menu

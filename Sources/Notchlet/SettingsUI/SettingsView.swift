@@ -84,7 +84,7 @@ private struct HUDSettingsView: View {
                         if enabled && !hud.isTrusted { hud.requestPermission() }
                     }
                 if isEnabled && !hud.isTrusted {
-                    Text("Autorise DynamicNotch dans Réglages Système > Confidentialité et sécurité > Accessibilité.")
+                    Text("Autorise Notchlet dans Réglages Système > Confidentialité et sécurité > Accessibilité.")
                         .foregroundStyle(.secondary)
                     Button("Ouvrir Réglages Système") { hud.openPermissionSettings() }
                 }
@@ -166,7 +166,7 @@ private struct BluetoothSettingsView: View {
                         if enabled && bluetooth.authorization == .notDetermined { bluetooth.requestPermission() }
                     }
                 if isEnabled && (bluetooth.authorization == .denied || bluetooth.authorization == .restricted) {
-                    Text("Autorise DynamicNotch dans Réglages Système > Confidentialité et sécurité > Bluetooth.")
+                    Text("Autorise Notchlet dans Réglages Système > Confidentialité et sécurité > Bluetooth.")
                         .foregroundStyle(.secondary)
                     Button("Ouvrir Réglages Système") { bluetooth.openPermissionSettings() }
                 }
@@ -188,7 +188,7 @@ private struct AboutView: View {
         VStack(spacing: 8) {
             Image(systemName: "capsule.fill")
                 .font(.system(size: 40))
-            Text("DynamicNotch")
+            Text("Notchlet")
                 .font(.title2.weight(.semibold))
             Text("Version \(version)")
                 .foregroundStyle(.secondary)

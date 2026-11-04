@@ -1,6 +1,6 @@
 import SwiftUI
 import XCTest
-@testable import DynamicNotch
+@testable import Notchlet
 
 private struct BriefActivity: Activity {
     let id: String

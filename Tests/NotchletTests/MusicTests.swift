@@ -1,6 +1,6 @@
 import AppKit
 import XCTest
-@testable import DynamicNotch
+@testable import Notchlet
 
 final class MusicTests: XCTestCase {
     private let start = Date(timeIntervalSinceReferenceDate: 0)

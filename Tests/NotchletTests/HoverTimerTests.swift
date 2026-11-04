@@ -1,5 +1,5 @@
 import XCTest
-@testable import DynamicNotch
+@testable import Notchlet
 
 final class HoverTimerTests: XCTestCase {
     private let start = Date(timeIntervalSinceReferenceDate: 0)
