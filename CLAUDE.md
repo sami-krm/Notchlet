@@ -17,6 +17,7 @@ Priorités : musique, HUD volume et luminosité, batterie et AirPods. API publiq
 ## Architecture
 ```
 Sources/Notchlet/
+  Assets.xcassets               Icône de l'app (AppIcon, générée depuis une image carrée)
   App/
     main.swift                  Point d'entrée, app "accessoire" (pas d'icône dans le Dock)
     AppDelegate.swift           Démarrage, icône de la barre des menus, changements d'écran

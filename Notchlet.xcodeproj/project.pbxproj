@@ -298,6 +298,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Notchlet contrôle la lecture de Spotify et de Musique depuis l'île.";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Notchlet affiche dans l'île les appareils Bluetooth qui se connectent, avec leur batterie.";
@@ -320,6 +321,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Notchlet contrôle la lecture de Spotify et de Musique depuis l'île.";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Notchlet affiche dans l'île les appareils Bluetooth qui se connectent, avec leur batterie.";
