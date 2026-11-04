@@ -12,6 +12,12 @@ enum SettingsKey {
     /// Niveau de batterie, en pourcentage, qui déclenche l'alerte.
     static let lowBatteryThreshold = "lowBatteryThreshold"
     static let lowBatterySoundEnabled = "lowBatterySoundEnabled"
+    /// Désactivé par défaut : l'activer déclenche la demande de permission Accessibilité.
+    static let hudEnabled = "hudEnabled"
+    static let brightnessHUDEnabled = "brightnessHUDEnabled"
+    static let hudBarStyle = "hudBarStyle"
+    static let hudAnimationSpeed = "hudAnimationSpeed"
+    static let hudShowsOutputDevice = "hudShowsOutputDevice"
 
     /// Valeurs utilisées tant que l'utilisateur n'a rien changé.
     static let defaults: [String: Any] = [
@@ -23,5 +29,10 @@ enum SettingsKey {
         lowBatteryAlertEnabled: true,
         lowBatteryThreshold: 20,
         lowBatterySoundEnabled: true,
+        hudEnabled: false,
+        brightnessHUDEnabled: true,
+        hudBarStyle: HUDBarStyle.white.rawValue,
+        hudAnimationSpeed: HUDAnimationSpeed.fast.rawValue,
+        hudShowsOutputDevice: true,
     ]
 }

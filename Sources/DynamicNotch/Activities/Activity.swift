@@ -13,9 +13,12 @@ protocol Activity {
     /// `AnyView` efface le type exact de la vue : chaque activité peut ainsi renvoyer
     /// une vue différente tout en respectant le même protocole.
     var closedView: AnyView { get }
+    /// Ligne facultative affichée sous l'encoche.
+    var closedFooter: AnyView? { get }
 }
 
 extension Activity {
     var displayDuration: TimeInterval { 3 }
     var closedWing: CGFloat { 34 }
+    var closedFooter: AnyView? { nil }
 }

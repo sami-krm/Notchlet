@@ -5,3 +5,5 @@ DerivedData/
 xcuserdata/
 *.xcuserstate
 graphify-out/
+
+Config/Signing.local.xcconfig

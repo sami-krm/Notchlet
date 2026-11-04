@@ -70,7 +70,10 @@ final class NotchWindowController: NSObject {
         startMouseTracking()
         startSwipeTracking()
         viewModel.startBatteryAlerts()
+        viewModel.startHUD()
     }
+
+    var hud: HUDManager { viewModel.hud }
 
     @objc private func applySettings() {
         // Sans `.fullScreenAuxiliary`, macOS n'affiche pas la fenêtre dans les espaces plein écran.

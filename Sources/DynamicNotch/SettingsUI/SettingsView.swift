@@ -2,10 +2,14 @@ import SwiftUI
 
 /// Les autres onglets arriveront avec leurs fonctionnalités.
 struct SettingsView: View {
+    let hud: HUDManager
+
     var body: some View {
         TabView {
             GeneralSettingsView()
                 .tabItem { Label("Général", systemImage: "gearshape") }
+            HUDSettingsView(hud: hud)
+                .tabItem { Label("HUD", systemImage: "speaker.wave.2") }
             NowPlayingSettingsView()
                 .tabItem { Label("Lecture en cours", systemImage: "music.note") }
             BatterySettingsView()
@@ -58,6 +62,48 @@ private struct GeneralSettingsView: View {
         }
         .formStyle(.grouped)
         .onAppear { launchAtLogin.refresh() }
+    }
+}
+
+private struct HUDSettingsView: View {
+    @ObservedObject var hud: HUDManager
+    @AppStorage(SettingsKey.hudEnabled) private var isEnabled = false
+    @AppStorage(SettingsKey.brightnessHUDEnabled) private var brightnessEnabled = true
+    @AppStorage(SettingsKey.hudBarStyle) private var barStyle = HUDBarStyle.white
+    @AppStorage(SettingsKey.hudAnimationSpeed) private var speed = HUDAnimationSpeed.fast
+    @AppStorage(SettingsKey.hudShowsOutputDevice) private var showsDevice = true
+
+    var body: some View {
+        Form {
+            Section {
+                Toggle("Remplacer les HUD de macOS", isOn: $isEnabled)
+                    .onChange(of: isEnabled) { enabled in
+                        if enabled && !hud.isTrusted { hud.requestPermission() }
+                    }
+                if isEnabled && !hud.isTrusted {
+                    Text("Autorise DynamicNotch dans Réglages Système > Confidentialité et sécurité > Accessibilité.")
+                        .foregroundStyle(.secondary)
+                    Button("Ouvrir Réglages Système") { hud.openPermissionSettings() }
+                }
+                Toggle("Inclure la luminosité", isOn: $brightnessEnabled)
+                    .disabled(!isEnabled)
+            } footer: {
+                Text("La luminosité repose sur une API privée d'Apple. Si elle cesse de fonctionner, macOS reprend la main sur ces touches.")
+                    .foregroundStyle(.secondary)
+            }
+
+            Section("Apparence") {
+                Picker("Barre", selection: $barStyle) {
+                    ForEach(HUDBarStyle.allCases) { Text($0.label).tag($0) }
+                }
+                Picker("Animation", selection: $speed) {
+                    ForEach(HUDAnimationSpeed.allCases) { Text($0.label).tag($0) }
+                }
+                Toggle("Afficher la sortie audio", isOn: $showsDevice)
+            }
+            .disabled(!isEnabled)
+        }
+        .formStyle(.grouped)
     }
 }
 

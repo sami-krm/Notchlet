@@ -10,7 +10,8 @@ Une « Dynamic Island » pour Mac, en Swift, SwiftUI et AppKit. Ce projet person
 - **Vue ouverte** : date, batterie, pochette, morceau en cours avec précédent / lecture-pause / suivant, barre de progression (clique ou fais-la glisser pour avancer ou reculer), et l'heure.
 - **Styles de couleur** : pochette (fond flou), coloré (couleur de la pochette sur l'égaliseur et la progression), dégradé (fond coloré), monochrome (noir et blanc).
 - **Gestes au trackpad**, à deux doigts sur l'île : vers le bas pour ouvrir, vers le haut pour fermer, vers la gauche pour le morceau suivant, vers la droite pour le précédent.
-- **Alertes de batterie** : quelques secondes dans l'île au branchement du chargeur et quand la batterie passe sous le seuil, avec un son (ceux de macOS). L'alerte s'affiche à la place de la musique, qui revient ensuite. Île ouverte, seul le son signale la batterie faible.
+- **Alertes de batterie** : quelques secondes dans l'île au branchement du chargeur et quand la batterie passe sous le seuil, avec un son (ceux de macOS). L'alerte s'affiche à la place de la musique, qui revient ensuite. Île ouverte, elle prend la place de la date.
+- **HUD volume et luminosité** (à activer dans l'onglet HUD) : remplace les HUD de macOS par une jauge dans l'île, avec le nom de la sortie audio. Avec Maj, Option, Contrôle ou Commande, les touches restent gérées par macOS.
 - Une icône dans la barre des menus donne accès aux réglages et permet de quitter l'app.
 
 ## Réglages
@@ -23,16 +24,20 @@ Ouvre-les depuis l'icône de la barre des menus, avec **Réglages…**.
 - **Masquer l'île en plein écran** : activé par défaut. L'île disparaît des apps en plein écran au sens de macOS, c'est-à-dire qui occupent leur propre espace.
 - **Style de couleur** : dans l'onglet Lecture en cours.
 - **Alertes de batterie** : dans l'onglet Batterie, avec un seuil de 5 à 50 % (20 % par défaut) et un son désactivable.
+- **HUD** : dans l'onglet HUD, avec la luminosité désactivable, le style de barre (blanc, couleur d'accent, lumineux), la vitesse d'animation et l'affichage de la sortie audio.
 
 ## Permissions
 
 | Permission | Pourquoi | Où la gérer |
 |---|---|---|
 | Automatisation | Lire la pochette et la position, et contrôler Spotify ou Musique | Réglages Système > Confidentialité et sécurité > Automatisation |
+| Accessibilité | Intercepter les touches de volume et de luminosité pour le HUD | Réglages Système > Confidentialité et sécurité > Accessibilité |
 
 macOS la demande dès le premier morceau détecté. Sans elle, l'île affiche l'icône de l'app au lieu de la pochette, sans barre de progression, et les boutons restent sans effet.
 
-Les gestes et les alertes de batterie ne demandent aucune permission. Pour Spotify, la pochette est téléchargée depuis l'adresse HTTPS fournie par l'app.
+L'Accessibilité n'est demandée que lorsque tu actives le HUD. Les gestes et les alertes de batterie ne demandent aucune permission.
+
+**API privée :** le HUD de luminosité utilise DisplayServices, une API non documentée d'Apple (voir `Sources/DynamicNotch/Private`). Si une mise à jour de macOS la retire, ces touches reviennent à macOS. Pour Spotify, la pochette est téléchargée depuis l'adresse HTTPS fournie par l'app.
 
 ## Lancer le projet
 
@@ -47,6 +52,8 @@ Pour lancer les tests : ⌘U dans Xcode, ou dans le Terminal :
 xcodebuild test -project DynamicNotch.xcodeproj -scheme DynamicNotch -destination 'platform=macOS'
 ```
 
+Le projet compile sans compte Apple, avec une signature ad hoc, mais macOS peut alors redemander l'Accessibilité après chaque compilation. Pour l'éviter, signe avec ton certificat en suivant les indications de `Config/Signing.xcconfig`.
+
 ## Organisation du code
 
 | Dossier | Rôle |
@@ -55,7 +62,8 @@ xcodebuild test -project DynamicNotch.xcodeproj -scheme DynamicNotch -destinatio
 | `Sources/DynamicNotch/Window` | Fenêtre transparente, survol, taille de l'encoche |
 | `Sources/DynamicNotch/Island` | État, forme et interface de l'île |
 | `Sources/DynamicNotch/Activities` | Protocole `Activity` et activités affichées dans l'île |
-| `Sources/DynamicNotch/Managers` | Accès au système : musique, batterie, lancement à l'ouverture de session |
+| `Sources/DynamicNotch/Managers` | Accès au système : musique, batterie, HUD, sortie audio, lancement à l'ouverture de session |
+| `Sources/DynamicNotch/Private` | Code qui dépend d'API privées d'Apple |
 | `Sources/DynamicNotch/SettingsUI` | Fenêtre et onglets de réglages |
 | `Tests/DynamicNotchTests` | Tests unitaires |
 

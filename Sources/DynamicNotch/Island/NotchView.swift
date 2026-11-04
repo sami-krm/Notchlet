@@ -47,9 +47,14 @@ struct NotchView: View {
     @ViewBuilder
     private var closedContent: some View {
         if let activity = vm.displayed {
-            activity.closedView
-                .padding(.horizontal, vm.closedTopRadius + 10)
-                .frame(height: vm.geometry.notchSize.height)
+            VStack(spacing: 0) {
+                activity.closedView
+                    .padding(.horizontal, vm.closedTopRadius + 10)
+                    .frame(height: vm.geometry.notchSize.height)
+                if let footer = activity.closedFooter {
+                    footer.frame(height: vm.closedFooterHeight)
+                }
+            }
         } else {
             Color.clear
         }
@@ -61,9 +66,15 @@ struct NotchView: View {
         VStack(spacing: 14) {
             // Ligne du haut : à gauche et à droite de l'encoche physique
             HStack {
-                Text(Date.now, format: .dateTime.weekday(.wide).day().month(.wide))
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(.white.opacity(0.7))
+                // Île ouverte, une activité brève prend la place de la date. Largeur limitée :
+                // au-delà, elle passerait sous l'encoche.
+                if let brief = vm.transientQueue.first {
+                    brief.closedView.frame(width: 110)
+                } else {
+                    Text(Date.now, format: .dateTime.weekday(.wide).day().month(.wide))
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(.white.opacity(0.7))
+                }
                 Spacer()
                 BatteryView(battery: battery)
             }

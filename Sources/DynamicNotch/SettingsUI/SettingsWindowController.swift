@@ -5,7 +5,12 @@ import SwiftUI
 /// la nôtre démarre par `main.swift`, on affiche donc la vue dans une `NSWindow`.
 @MainActor
 final class SettingsWindowController {
+    private let hud: HUDManager
     private var window: NSWindow?
+
+    init(hud: HUDManager) {
+        self.hud = hud
+    }
 
     func show() {
         let window = window ?? makeWindow()
@@ -17,7 +22,7 @@ final class SettingsWindowController {
     }
 
     private func makeWindow() -> NSWindow {
-        let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView()))
+        let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(hud: hud)))
         window.title = "Réglages de DynamicNotch"
         window.styleMask = [.titled, .closable]
         // La fenêtre fermée reste en mémoire pour être rouverte.

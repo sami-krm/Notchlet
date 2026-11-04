@@ -12,6 +12,7 @@ final class NotchViewModel: NSObject, ObservableObject {
 
     let media = MediaManager()
     let battery = BatteryManager()
+    let hud = HUDManager()
 
     // Rayons de la forme (fermée / ouverte)
     let closedTopRadius: CGFloat = 6
@@ -20,6 +21,9 @@ final class NotchViewModel: NSObject, ObservableObject {
     let openBottomRadius: CGFloat = 26
 
     let openSize = CGSize(width: 520, height: 180)
+
+    /// Hauteur ajoutée sous l'encoche quand l'activité affichée a une ligne en plus.
+    let closedFooterHeight: CGFloat = 22
 
     private var transientTimer: Timer?
 
@@ -33,7 +37,8 @@ final class NotchViewModel: NSObject, ObservableObject {
     var closedSize: CGSize {
         var width = geometry.notchSize.width + 2 * closedTopRadius
         if let displayed { width += 2 * displayed.closedWing }
-        return CGSize(width: width, height: geometry.notchSize.height)
+        let footer = displayed?.closedFooter == nil ? 0 : closedFooterHeight
+        return CGSize(width: width, height: geometry.notchSize.height + footer)
     }
 
     var currentSize: CGSize { state == .open ? openSize : closedSize }
@@ -56,6 +61,21 @@ final class NotchViewModel: NSObject, ObservableObject {
         battery.update()
     }
 
+    func startHUD() {
+        hud.onActivity = { [weak self] activity in
+            self?.showImmediately(activity)
+        }
+        hud.start()
+    }
+
+    /// Affiche l'activité tout de suite, sans attendre la file : un HUD doit répondre à
+    /// l'appui. Elle remplace une activité de même genre et relance la durée d'affichage.
+    func showImmediately(_ activity: any Activity) {
+        transientQueue.removeAll { $0.id == activity.id }
+        transientQueue.insert(activity, at: 0)
+        startTransientTimer()
+    }
+
     func enqueue(_ activity: any Activity) {
         // Brancher et débrancher plusieurs fois ne doit pas empiler la même alerte.
         guard !transientQueue.contains(where: { $0.id == activity.id }) else { return }
@@ -73,6 +93,7 @@ final class NotchViewModel: NSObject, ObservableObject {
     }
 
     private func startTransientTimer() {
+        transientTimer?.invalidate()
         guard let current = transientQueue.first else { return }
         let timer = Timer(timeInterval: current.displayDuration, target: self,
                           selector: #selector(finishCurrentTransient), userInfo: nil, repeats: false)

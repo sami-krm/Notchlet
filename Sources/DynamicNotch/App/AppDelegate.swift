@@ -4,7 +4,7 @@ import AppKit
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var notchController: NotchWindowController?
     private var statusItem: NSStatusItem?
-    private let settingsWindow = SettingsWindowController()
+    private var settingsWindow: SettingsWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         UserDefaults.standard.register(defaults: SettingsKey.defaults)
@@ -12,6 +12,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let controller = NotchWindowController()
         controller.show()
         notchController = controller
+        settingsWindow = SettingsWindowController(hud: controller.hud)
 
         setupStatusItem()
 
@@ -29,7 +30,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     @objc private func openSettings() {
-        settingsWindow.show()
+        settingsWindow?.show()
     }
 
     /// Petite icône dans la barre des menus : réglages et sortie de l'app.

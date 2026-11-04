@@ -1,0 +1,9 @@
+// Signature des compilations de développement.
+// Par défaut : ad hoc, sans compte Apple. macOS peut alors redemander la permission
+// Accessibilité après chaque compilation.
+CODE_SIGN_IDENTITY = -
+
+// Pour une signature stable, crée Config/Signing.local.xcconfig (ignoré par Git) avec :
+//   CODE_SIGN_IDENTITY = Apple Development
+//   DEVELOPMENT_TEAM = <ton identifiant d'équipe>
+#include? "Signing.local.xcconfig"

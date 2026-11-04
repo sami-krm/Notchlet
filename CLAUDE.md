@@ -5,7 +5,7 @@ DynamicNotch est une « Dynamic Island » pour Mac, développée par un étudian
 Le modèle de référence est **Alcove 1.7.7** (tryalcove.com). Objectif à terme : reproduire toutes ses fonctionnalités, puis aller au-delà.
 Le développement et les tests se font sur un MacBook avec Xcode.
 Diffusion : code public sur GitHub, téléchargements via GitHub Releases, sans compte développeur Apple pour l'instant (donc sans notarisation ni WeatherKit).
-Priorités : musique, HUD volume et luminosité, batterie et AirPods. API publiques d'abord ; les API privées arrivent en dernier, isolées et désactivables.
+Priorités : musique, HUD volume et luminosité, batterie et AirPods. API publiques d'abord ; les API privées arrivent en dernier, isolées et désactivables. Exception validée : la luminosité du HUD utilise déjà DisplayServices, faute d'API publique.
 
 ## Stack technique (à respecter)
 - **Langage** : Swift 5.9+ (mode de langage Swift 5 tant que le projet n'est pas migré vers Swift 6).
@@ -35,16 +35,22 @@ Sources/DynamicNotch/
     MusicActivity.swift         Morceau en cours dans l'île fermée, barre de progression
     MusicColorStyle.swift       Styles de couleur, pochette et fond de l'île
     BatteryAlertActivity.swift  Alertes de charge et de batterie faible
+    HUDActivity.swift           HUD volume et luminosité, styles de barre, vitesse d'animation
   Managers/
     MediaManager.swift          Musique (notifications Spotify/Musique, AppleScript via osascript, hors du thread principal)
     BatteryManager.swift        Batterie (IOKit, notifications d'alimentation), décision des alertes
     LaunchAtLoginManager.swift  Lancement à l'ouverture de session (SMAppService)
+    HUDManager.swift            Touches média (CGEventTap, permission Accessibilité)
+    AudioOutput.swift           Volume et sortie audio (Core Audio)
+  Private/
+    DisplayBrightness.swift     Luminosité (API privée DisplayServices, chargée avec dlopen)
   SettingsUI/
     SettingsWindowController.swift Fenêtre de réglages (NSWindow)
-    SettingsView.swift          Onglets Général, Lecture en cours, Batterie et À propos
+    SettingsView.swift          Onglets Général, HUD, Lecture en cours, Batterie et À propos
 Tests/DynamicNotchTests/        Tests unitaires
 ```
-Dossier à créer quand il servira : `Private/` (API privées, chaque fonction désactivable). Un onglet de réglages s'ajoute avec la fonctionnalité qu'il règle.
+`Private/` regroupe le code des API privées : chaque fonction est désactivable et laisse macOS reprendre la main si l'API disparaît. Un onglet de réglages s'ajoute avec la fonctionnalité qu'il règle.
+La signature de développement est dans `Config/Signing.xcconfig` (ad hoc par défaut). Le certificat et l'identifiant d'équipe restent dans `Config/Signing.local.xcconfig`, ignoré par Git : ils ne doivent pas arriver dans le dépôt public.
 Règles :
 - **Un fichier par service** (`CalendarManager`, `HUDManager`, `BluetoothManager`…), chacun en `ObservableObject` avec des propriétés `@Published`.
 - **Une activité = un type** conforme au protocole `Activity`. Une activité brève (HUD, alerte) passe par la file du ViewModel : elle remplace l'activité de fond quelques secondes, puis celle-ci revient. Le mode « Duo » viendra plus tard.
