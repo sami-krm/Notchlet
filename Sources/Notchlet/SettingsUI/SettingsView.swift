@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Une rubrique de la barre latérale. Une rubrique s'ajoute avec la fonctionnalité qu'elle règle.
 enum SettingsPage: String, CaseIterable, Identifiable {
-    case general, battery, devices, brightness, volume, nowPlaying, about
+    case general, battery, devices, brightness, volume, nowPlaying, calendar, about
 
     var id: String { rawValue }
 
@@ -14,6 +14,7 @@ enum SettingsPage: String, CaseIterable, Identifiable {
         case .brightness: return "Luminosité"
         case .volume: return "Volume"
         case .nowPlaying: return "Lecture en cours"
+        case .calendar: return "Calendrier"
         case .about: return "À propos"
         }
     }
@@ -26,6 +27,7 @@ enum SettingsPage: String, CaseIterable, Identifiable {
         case .brightness: return "sun.max.fill"
         case .volume: return "speaker.wave.2.fill"
         case .nowPlaying: return "play.fill"
+        case .calendar: return "calendar"
         case .about: return "info"
         }
     }
@@ -38,6 +40,7 @@ enum SettingsPage: String, CaseIterable, Identifiable {
         case .brightness: return [Color(red: 1.00, green: 0.80, blue: 0.30), Color(red: 0.96, green: 0.60, blue: 0.14)]
         case .volume: return [Color(red: 0.62, green: 0.52, blue: 0.98), Color(red: 0.42, green: 0.30, blue: 0.88)]
         case .nowPlaying: return [Color(red: 1.00, green: 0.45, blue: 0.45), Color(red: 0.88, green: 0.22, blue: 0.32)]
+        case .calendar: return [Color(red: 0.32, green: 0.80, blue: 0.82), Color(red: 0.12, green: 0.58, blue: 0.66)]
         case .about: return [Color(white: 0.55), Color(white: 0.38)]
         }
     }
@@ -46,7 +49,7 @@ enum SettingsPage: String, CaseIterable, Identifiable {
     static let groups: [(title: String?, pages: [SettingsPage])] = [
         (nil, [.general]),
         ("Notifications", [.battery, .devices, .brightness, .volume]),
-        ("Activités", [.nowPlaying]),
+        ("Activités", [.nowPlaying, .calendar]),
         ("Notchlet", [.about]),
     ]
 }
@@ -54,6 +57,7 @@ enum SettingsPage: String, CaseIterable, Identifiable {
 struct SettingsView: View {
     let hud: HUDManager
     let bluetooth: BluetoothManager
+    let calendar: CalendarManager
     @State var page: SettingsPage = .general
 
     var body: some View {
@@ -128,6 +132,7 @@ struct SettingsView: View {
                     case .brightness: BrightnessPage(hud: hud)
                     case .volume: VolumePage(hud: hud)
                     case .nowPlaying: NowPlayingPage()
+                    case .calendar: CalendarPage(calendar: calendar)
                     case .about: AboutPage()
                     }
                 }
@@ -443,6 +448,73 @@ private struct NowPlayingPage: View {
             if quickPeek {
                 SettingsDivider()
                 SettingsSliderRow(title: "Durée de l'aperçu", value: $peekDuration, range: 1...5, step: 0.5, format: seconds)
+            }
+        }
+    }
+}
+
+// MARK: - Calendrier
+
+private struct CalendarPage: View {
+    @ObservedObject var calendar: CalendarManager
+    @AppStorage(SettingsKey.calendarEnabled) private var isEnabled = false
+    @AppStorage(SettingsKey.calendarReminderEnabled) private var reminderEnabled = true
+    @AppStorage(SettingsKey.calendarReminderLead) private var lead = 10.0
+    @AppStorage(SettingsKey.calendarAlertDuration) private var duration = 5.0
+    @AppStorage(SettingsKey.calendarSoundEnabled) private var sound = true
+    @AppStorage(SettingsKey.hourlyChimeEnabled) private var hourlyChime = false
+
+    var body: some View {
+        SettingsCard {
+            SettingsToggleRow(title: "Afficher les événements dans l'île", isOn: $isEnabled)
+                .onChange(of: isEnabled) { enabled in
+                    if enabled && !calendar.isAuthorized { calendar.requestAccess() }
+                }
+            if isEnabled && calendar.isDenied {
+                SettingsDivider()
+                PermissionRow(
+                    message: "Autorise Notchlet dans Réglages Système > Confidentialité et sécurité > Calendriers.",
+                    action: calendar.openPermissionSettings
+                )
+            }
+        }
+
+        SettingsSectionTitle(title: "Rappels")
+        SettingsCard {
+            SettingsToggleRow(title: "Rappeler avant un événement", isOn: $reminderEnabled)
+            if reminderEnabled {
+                SettingsDivider()
+                SettingsSliderRow(title: "Délai du rappel", value: $lead, range: 1...30, step: 1) {
+                    String(format: "%.0f min", $0)
+                }
+                SettingsDivider()
+                SettingsSliderRow(title: "Durée d'affichage", value: $duration, range: 1...10, step: 0.5, format: seconds)
+                SettingsDivider()
+                SettingsToggleRow(title: "Jouer un son", isOn: $sound)
+            }
+        }
+        .disabled(!isEnabled)
+
+        SettingsSectionTitle(title: "Carillon")
+        SettingsCard {
+            SettingsToggleRow(title: "Sonner à chaque heure", isOn: $hourlyChime)
+        }
+
+        if isEnabled && !calendar.calendars.isEmpty {
+            SettingsSectionTitle(title: "Calendriers")
+            SettingsCard {
+                ForEach(Array(calendar.calendars.enumerated()), id: \.element.id) { index, item in
+                    if index > 0 { SettingsDivider() }
+                    HStack(spacing: 10) {
+                        Circle().fill(Color(cgColor: item.color)).frame(width: 10, height: 10)
+                        SettingsToggleRow(title: item.title, isOn: Binding(
+                            get: { calendar.isVisible(item) },
+                            set: { calendar.setVisible($0, calendar: item) }
+                        ))
+                        .padding(.horizontal, -14)
+                    }
+                    .padding(.horizontal, 14)
+                }
             }
         }
     }

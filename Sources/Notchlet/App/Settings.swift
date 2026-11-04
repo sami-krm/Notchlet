@@ -49,6 +49,16 @@ enum SettingsKey {
     static let bluetoothAlertsEnabled = "bluetoothAlertsEnabled"
     static let bluetoothAlertDuration = "bluetoothAlertDuration"
 
+    // Calendrier. Désactivé par défaut : l'activer déclenche la demande de permission Calendrier.
+    static let calendarEnabled = "calendarEnabled"
+    static let calendarReminderEnabled = "calendarReminderEnabled"
+    /// Temps entre le rappel et le début de l'événement, en minutes.
+    static let calendarReminderLead = "calendarReminderLead"
+    static let calendarAlertDuration = "calendarAlertDuration"
+    static let calendarSoundEnabled = "calendarSoundEnabled"
+    static let hourlyChimeEnabled = "hourlyChimeEnabled"
+    static let hiddenCalendarIDs = "hiddenCalendarIDs"
+
     /// Valeurs utilisées tant que l'utilisateur n'a rien changé.
     static let defaults: [String: Any] = [
         expandOnHover: true,
@@ -85,12 +95,18 @@ enum SettingsKey {
         hudShowsOutputDevice: true,
         bluetoothAlertsEnabled: false,
         bluetoothAlertDuration: 4.0,
+        calendarEnabled: false,
+        calendarReminderEnabled: true,
+        calendarReminderLead: 10.0,
+        calendarAlertDuration: 5.0,
+        calendarSoundEnabled: true,
+        hourlyChimeEnabled: false,
     ]
 }
 
 /// Ce que l'île affiche quand aucune activité brève n'est en cours.
 enum IdleActivity: String, CaseIterable, Identifiable {
-    case none, music
+    case none, music, calendar
 
     var id: String { rawValue }
 
@@ -98,6 +114,7 @@ enum IdleActivity: String, CaseIterable, Identifiable {
         switch self {
         case .none: return "Rien"
         case .music: return "Musique"
+        case .calendar: return "Calendrier"
         }
     }
 
@@ -105,6 +122,7 @@ enum IdleActivity: String, CaseIterable, Identifiable {
         switch self {
         case .none: return "nosign"
         case .music: return "play.fill"
+        case .calendar: return "calendar"
         }
     }
 }

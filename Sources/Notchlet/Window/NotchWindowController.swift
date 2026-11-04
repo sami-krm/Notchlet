@@ -52,7 +52,8 @@ final class NotchWindowController: NSObject {
         let host = NotchHostingView(rootView: NotchView(
             vm: viewModel,
             media: viewModel.media,
-            battery: viewModel.battery
+            battery: viewModel.battery,
+            calendar: viewModel.calendar
         ))
         host.sizingOptions = []
         panel.contentView = host
@@ -74,11 +75,13 @@ final class NotchWindowController: NSObject {
         viewModel.startBatteryAlerts()
         viewModel.startHUD()
         viewModel.startBluetooth()
+        viewModel.startCalendar()
         viewModel.media.onTrackChanged = { [weak self] in self?.showQuickPeek() }
     }
 
     var hud: HUDManager { viewModel.hud }
     var bluetooth: BluetoothManager { viewModel.bluetooth }
+    var calendar: CalendarManager { viewModel.calendar }
 
     @objc private func applySettings() {
         // Sans `.fullScreenAuxiliary`, macOS n'affiche pas la fenêtre dans les espaces plein écran.
@@ -184,6 +187,7 @@ final class NotchWindowController: NSObject {
             viewModel.media.refreshPlaybackModes()
         } else {
             viewModel.showsVolumeControl = false
+            viewModel.showsCalendar = false
         }
     }
 

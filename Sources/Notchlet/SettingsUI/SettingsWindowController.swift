@@ -7,11 +7,13 @@ import SwiftUI
 final class SettingsWindowController {
     private let hud: HUDManager
     private let bluetooth: BluetoothManager
+    private let calendar: CalendarManager
     private var window: NSWindow?
 
-    init(hud: HUDManager, bluetooth: BluetoothManager) {
+    init(hud: HUDManager, bluetooth: BluetoothManager, calendar: CalendarManager) {
         self.hud = hud
         self.bluetooth = bluetooth
+        self.calendar = calendar
     }
 
     func show() {
@@ -24,7 +26,7 @@ final class SettingsWindowController {
     }
 
     private func makeWindow() -> NSWindow {
-        let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(hud: hud, bluetooth: bluetooth)))
+        let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(hud: hud, bluetooth: bluetooth, calendar: calendar)))
         window.title = "Réglages de Notchlet"
         // Le contenu monte sous la barre de titre, devenue invisible : seuls restent les
         // boutons de fenêtre, au-dessus de la barre latérale.

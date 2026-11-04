@@ -11,7 +11,11 @@ final class NotchViewModel: NSObject, ObservableObject {
     @Published private(set) var transientQueue: [any Activity] = []
     /// Ligne de volume sous les commandes de lecture.
     @Published var showsVolumeControl = false
+    /// Avec de la musique, affiche les événements à la place du lecteur.
+    @Published var showsCalendar = false
 
+    let calendar = CalendarManager()
+    let chime = ChimeManager()
     let media = MediaManager()
     let battery = BatteryManager()
     let hud = HUDManager()
@@ -55,10 +59,28 @@ final class NotchViewModel: NSObject, ObservableObject {
     var displayed: (any Activity)? { transientQueue.first ?? background }
 
     private var background: (any Activity)? {
-        guard media.track != nil,
-              UserDefaults.standard.string(forKey: SettingsKey.idleActivity) != IdleActivity.none.rawValue
-        else { return nil }
-        return MusicActivity(media: media)
+        let idle = UserDefaults.standard.string(forKey: SettingsKey.idleActivity)
+        if idle == IdleActivity.none.rawValue { return nil }
+        if idle == IdleActivity.calendar.rawValue, calendar.nextTimedEvent() != nil {
+            return CalendarIdleActivity(calendar: calendar)
+        }
+        return media.track == nil ? nil : MusicActivity(media: media)
+    }
+
+    /// Sans musique, les événements s'affichent d'office ; avec musique, à la demande.
+    var showsCalendarPage: Bool {
+        !calendar.events.isEmpty && (media.track == nil || showsCalendar)
+    }
+
+    func startCalendar() {
+        calendar.onReminder = { [weak self] event in
+            self?.enqueue(CalendarReminderActivity(
+                event: event,
+                duration: UserDefaults.standard.double(forKey: SettingsKey.calendarAlertDuration)
+            ))
+        }
+        calendar.start()
+        chime.start()
     }
 
     /// Branche les alertes de batterie sur la file. Séparé de `init` pour que les tests

@@ -32,6 +32,7 @@ Sources/Notchlet/
     NotchShape.swift            Forme animable de l'île
     NotchView.swift             Interface SwiftUI de l'île
     MusicOpenView.swift         Île ouverte avec musique, commandes, ligne de volume
+    CalendarOpenView.swift      Île ouverte avec les prochains événements, bouton « Rejoindre »
   Activities/
     Activity.swift              Protocole commun des activités
     MusicActivity.swift         Morceau en cours dans l'île fermée, barre de progression
@@ -39,6 +40,7 @@ Sources/Notchlet/
     BatteryAlertActivity.swift  Alertes de charge et de batterie faible
     HUDActivity.swift           HUD volume et luminosité, styles de barre, vitesse d'animation
     BluetoothActivity.swift     Connexion d'un appareil Bluetooth
+    CalendarActivity.swift      Rappel d'événement et prochain événement dans l'île fermée
   Managers/
     MediaManager.swift          Musique (notifications Spotify/Musique, AppleScript via osascript, hors du thread principal)
     BatteryManager.swift        Batterie (IOKit, notifications d'alimentation), décision des alertes
@@ -46,11 +48,13 @@ Sources/Notchlet/
     HUDManager.swift            Touches média (CGEventTap, permission Accessibilité)
     AudioOutput.swift           Volume et sortie audio (Core Audio)
     BluetoothManager.swift      Connexions (IOBluetooth, permission Bluetooth), batterie (system_profiler)
+    CalendarManager.swift       Événements et rappels (EventKit, permission Calendrier), liens de visio
+    ChimeManager.swift          Carillon à chaque heure
   Private/
     DisplayBrightness.swift     Luminosité (API privée DisplayServices, chargée avec dlopen)
   SettingsUI/
     SettingsWindowController.swift Fenêtre de réglages (NSWindow)
-    SettingsView.swift          Barre latérale et rubriques (Général, Batterie, Appareils, Luminosité, Volume, Lecture en cours, À propos)
+    SettingsView.swift          Barre latérale et rubriques (Général, Batterie, Appareils, Luminosité, Volume, Lecture en cours, Calendrier, À propos)
     SettingsComponents.swift    Cartes, lignes, curseurs, tuiles de choix, couleur d'accent
 Tests/NotchletTests/        Tests unitaires
 ```

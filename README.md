@@ -27,9 +27,11 @@ Ouvre l'app seulement si tu fais confiance à sa source : télécharge-la depuis
 - **Aperçu rapide** : l'île s'ouvre quelques secondes quand le morceau change.
 - **Styles de couleur** : pochette (fond flou), coloré (couleur de la pochette sur l'égaliseur et la progression), dégradé (fond coloré), monochrome (noir et blanc).
 - **Gestes au trackpad**, à deux doigts sur l'île : vers le bas pour ouvrir, vers le haut pour fermer, vers la gauche pour le morceau suivant, vers la droite pour le précédent.
-- **Alertes de batterie** : quelques secondes dans l'île au branchement du chargeur et quand la batterie passe sous le seuil, avec un son (ceux de macOS). L'alerte s'affiche à la place de la musique, qui revient ensuite. Île ouverte, elle s'affiche à droite de l'encoche.
+- **Alertes de batterie** : quelques secondes dans l'île au branchement du chargeur et quand la batterie passe sous le seuil, avec un son (ceux de macOS). L'alerte s'affiche à la place de la musique, qui revient ensuite. Île ouverte, elle s'affiche sous l'encoche.
 - **HUD volume et luminosité** (à activer dans leurs rubriques) : remplace les HUD de macOS par une jauge dans l'île, avec le nom de la sortie audio. Avec Maj, Option, Contrôle ou Commande, les touches restent gérées par macOS.
 - **Appareils Bluetooth** (à activer dans la rubrique Appareils) : à la connexion, l'île affiche l'icône de l'appareil avec un petit rebond, son nom et sa batterie. Pour des écouteurs, c'est le niveau le plus faible des deux.
+- **Calendrier** (à activer dans la rubrique Calendrier) : les trois prochains événements dans l'île ouverte, un rappel avant chaque événement, et un bouton « Rejoindre » pour Google Meet, Microsoft Teams, Zoom et Webex. Avec de la musique, un bouton à droite de l'encoche passe du lecteur aux événements.
+- **Carillon** (à activer dans la rubrique Calendrier) : un son de macOS à chaque heure pile.
 - Une icône dans la barre des menus donne accès aux réglages et permet de quitter l'app.
 
 ## Réglages
@@ -41,6 +43,7 @@ Ouvre-les depuis l'icône de la barre des menus, avec **Réglages…**.
 - **Appareils** : alerte de connexion Bluetooth et sa durée.
 - **Luminosité** et **Volume** : remplacement du HUD de macOS, durée, style de barre (blanc, couleur d'accent, lumineux), pourcentage, vitesse d'animation, et sortie audio pour le volume.
 - **Lecture en cours** : style de couleur, bouton à gauche des commandes, aperçu rapide et sa durée.
+- **Calendrier** : affichage des événements, rappel avec son délai de 1 à 30 minutes (10 par défaut), sa durée et son son, carillon horaire, choix des calendriers.
 - **À propos** : version et liens vers le projet.
 
 ## Permissions
@@ -50,10 +53,11 @@ Ouvre-les depuis l'icône de la barre des menus, avec **Réglages…**.
 | Automatisation | Lire la pochette et la position, et contrôler Spotify ou Musique | Réglages Système > Confidentialité et sécurité > Automatisation |
 | Accessibilité | Intercepter les touches de volume et de luminosité pour le HUD | Réglages Système > Confidentialité et sécurité > Accessibilité |
 | Bluetooth | Détecter la connexion des appareils | Réglages Système > Confidentialité et sécurité > Bluetooth |
+| Calendriers | Lire les prochains événements (aucune modification, rien n'est enregistré ni envoyé) | Réglages Système > Confidentialité et sécurité > Calendriers |
 
 L'Automatisation est demandée dès le premier morceau détecté. Sans elle, l'île affiche l'icône de l'app au lieu de la pochette, sans barre de progression, et les boutons restent sans effet.
 
-L'Accessibilité n'est demandée que lorsque tu actives un HUD, et le Bluetooth lorsque tu actives la rubrique Appareils. La batterie des appareils vient de l'outil système `system_profiler`, sans API privée, mais son format n'est pas documenté. Les gestes et les alertes de batterie ne demandent aucune permission.
+L'Accessibilité n'est demandée que lorsque tu actives un HUD, le Bluetooth lorsque tu actives la rubrique Appareils, et les Calendriers lorsque tu actives leur rubrique. « Rejoindre » n'ouvre que des liens HTTPS vers les quatre services cités. La batterie des appareils vient de l'outil système `system_profiler`, sans API privée, mais son format n'est pas documenté. Les gestes et les alertes de batterie ne demandent aucune permission.
 
 **API privée :** le HUD de luminosité utilise DisplayServices, une API non documentée d'Apple (voir `Sources/Notchlet/Private`). Si une mise à jour de macOS la retire, ces touches reviennent à macOS. Pour Spotify, la pochette est téléchargée depuis l'adresse HTTPS fournie par l'app.
 

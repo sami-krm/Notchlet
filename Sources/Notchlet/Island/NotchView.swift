@@ -4,6 +4,7 @@ struct NotchView: View {
     @ObservedObject var vm: NotchViewModel
     @ObservedObject var media: MediaManager
     @ObservedObject var battery: BatteryManager
+    @ObservedObject var calendar: CalendarManager
 
     private let spring = Animation.spring(response: 0.42, dampingFraction: 0.78)
 
@@ -41,6 +42,7 @@ struct NotchView: View {
         .animation(spring, value: vm.displayed?.id)
         .animation(spring, value: vm.geometry)
         .animation(spring, value: vm.showsVolumeControl)
+        .animation(spring, value: vm.showsCalendarPage)
     }
 
     // MARK: - Fermée : "live activity" de chaque côté de l'encoche
@@ -65,10 +67,35 @@ struct NotchView: View {
 
     private var openContent: some View {
         Group {
-            if media.track == nil {
+            if vm.showsCalendarPage {
+                CalendarOpenView(
+                    events: calendar.events,
+                    horizontalPadding: 18 + vm.openTopRadius,
+                    topPadding: vm.geometry.notchSize.height + 4,
+                    onJoin: { calendar.join($0) }
+                )
+            } else if media.track == nil {
                 idleOpenContent
             } else {
                 MusicOpenView(vm: vm, media: media)
+            }
+        }
+        // Avec de la musique et des événements : passer de l'un à l'autre, à droite de l'encoche.
+        .overlay(alignment: .topTrailing) {
+            if media.track != nil, !calendar.events.isEmpty {
+                Button {
+                    vm.showsCalendar.toggle()
+                } label: {
+                    Image(systemName: vm.showsCalendar ? "music.note" : "calendar")
+                        .font(.system(size: 13, weight: .semibold))
+                        .frame(width: 30, height: 26)
+                        .background(RoundedRectangle(cornerRadius: 8).fill(Color.white.opacity(0.1)))
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(vm.showsCalendar ? "Afficher la musique" : "Afficher le calendrier")
+                .padding(.top, 4)
+                .padding(.trailing, vm.openTopRadius + 12)
             }
         }
         // Une activité brève s'affiche juste sous l'encoche : à côté, la place manque.
