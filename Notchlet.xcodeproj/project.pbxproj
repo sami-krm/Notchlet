@@ -298,12 +298,15 @@
 				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Notchlet contrôle la lecture de Spotify et de Musique depuis l'île.";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Notchlet affiche dans l'île les appareils Bluetooth qui se connectent, avec leur batterie.";
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Notchlet affiche tes prochains événements et te les rappelle dans l'île.";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Notchlet affiche tes prochains événements et te les rappelle dans l'île.";
+				INFOPLIST_KEY_NSLocationUsageDescription = "Notchlet affiche la météo de l'endroit où tu te trouves.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Notchlet affiche la météo de l'endroit où tu te trouves.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -323,12 +326,15 @@
 				CURRENT_PROJECT_VERSION = 2;
 				DEAD_CODE_STRIPPING = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "Notchlet contrôle la lecture de Spotify et de Musique depuis l'île.";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Notchlet affiche dans l'île les appareils Bluetooth qui se connectent, avec leur batterie.";
 				INFOPLIST_KEY_NSCalendarsFullAccessUsageDescription = "Notchlet affiche tes prochains événements et te les rappelle dans l'île.";
 				INFOPLIST_KEY_NSCalendarsUsageDescription = "Notchlet affiche tes prochains événements et te les rappelle dans l'île.";
+				INFOPLIST_KEY_NSLocationUsageDescription = "Notchlet affiche la météo de l'endroit où tu te trouves.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Notchlet affiche la météo de l'endroit où tu te trouves.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

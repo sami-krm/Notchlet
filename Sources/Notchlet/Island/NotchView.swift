@@ -5,6 +5,9 @@ struct NotchView: View {
     @ObservedObject var media: MediaManager
     @ObservedObject var battery: BatteryManager
     @ObservedObject var calendar: CalendarManager
+    @ObservedObject var weather: WeatherManager
+    let shelf: ShelfManager
+    @AppStorage(SettingsKey.shelfEnabled) private var shelfEnabled = true
 
     private let spring = Animation.spring(response: 0.42, dampingFraction: 0.78)
 
@@ -67,7 +70,13 @@ struct NotchView: View {
 
     private var openContent: some View {
         Group {
-            if vm.showsCalendarPage {
+            if vm.showsShelf {
+                ShelfOpenView(
+                    shelf: shelf,
+                    horizontalPadding: 18 + vm.openTopRadius,
+                    topPadding: vm.geometry.notchSize.height + 6
+                )
+            } else if vm.showsCalendarPage {
                 CalendarOpenView(
                     events: calendar.events,
                     horizontalPadding: 18 + vm.openTopRadius,
@@ -80,23 +89,34 @@ struct NotchView: View {
                 MusicOpenView(vm: vm, media: media)
             }
         }
-        // Avec de la musique et des événements : passer de l'un à l'autre, à droite de l'encoche.
-        .overlay(alignment: .topTrailing) {
-            if media.track != nil, !calendar.events.isEmpty {
-                Button {
-                    vm.showsCalendar.toggle()
-                } label: {
-                    Image(systemName: vm.showsCalendar ? "music.note" : "calendar")
-                        .font(.system(size: 13, weight: .semibold))
-                        .frame(width: 30, height: 26)
-                        .background(RoundedRectangle(cornerRadius: 8).fill(Color.white.opacity(0.1)))
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(vm.showsCalendar ? "Afficher la musique" : "Afficher le calendrier")
-                .padding(.top, 4)
-                .padding(.trailing, vm.openTopRadius + 12)
+        // Le calendrier et l'étagère prennent toute la place : la météo passe à gauche de l'encoche.
+        .overlay(alignment: .topLeading) {
+            if let report = weather.report, vm.showsShelf || vm.showsCalendarPage {
+                WeatherBadge(report: report)
+                    .frame(height: vm.geometry.notchSize.height)
+                    .padding(.leading, vm.openTopRadius + 14)
             }
+        }
+        // Changer de page, à droite de l'encoche.
+        .overlay(alignment: .topTrailing) {
+            HStack(spacing: 4) {
+                if media.track != nil, !calendar.events.isEmpty {
+                    pageButton(symbol: vm.showsCalendar ? "music.note" : "calendar",
+                               label: vm.showsCalendar ? "Afficher la musique" : "Afficher le calendrier") {
+                        vm.showsCalendar.toggle()
+                        vm.showsShelf = false
+                    }
+                }
+                if shelfEnabled {
+                    pageButton(symbol: "tray.full.fill",
+                               label: vm.showsShelf ? "Fermer l'étagère" : "Afficher l'étagère",
+                               isActive: vm.showsShelf) {
+                        vm.showsShelf.toggle()
+                    }
+                }
+            }
+            .padding(.top, 4)
+            .padding(.trailing, vm.openTopRadius + 8)
         }
         // Une activité brève s'affiche juste sous l'encoche : à côté, la place manque.
         .overlay(alignment: .topTrailing) {
@@ -112,7 +132,21 @@ struct NotchView: View {
         }
     }
 
-    /// Sans musique : l'heure, la date et la batterie, sous l'encoche.
+    private func pageButton(symbol: String, label: String, isActive: Bool = false,
+                            action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(isActive ? NotchletStyle.accent : Color.white)
+                .frame(width: 30, height: 26)
+                .background(RoundedRectangle(cornerRadius: 8).fill(Color.white.opacity(0.1)))
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
+    }
+
+    /// Sans musique : l'heure, la date, la batterie et la météo, sous l'encoche.
     private var idleOpenContent: some View {
         VStack(spacing: 6) {
             Spacer(minLength: vm.geometry.notchSize.height)
@@ -126,10 +160,14 @@ struct NotchView: View {
                 Spacer()
                 VStack(alignment: .trailing, spacing: 10) {
                     BatteryView(battery: battery)
-                    Text("Lance Spotify ou Musique")
-                        .font(.system(size: 11))
-                        .foregroundStyle(.white.opacity(0.5))
-                        .lineLimit(1)
+                    if let report = weather.report {
+                        WeatherBadge(report: report)
+                    } else {
+                        Text("Lance Spotify ou Musique")
+                            .font(.system(size: 11))
+                            .foregroundStyle(.white.opacity(0.5))
+                            .lineLimit(1)
+                    }
                 }
             }
             Spacer(minLength: 0)
@@ -140,6 +178,23 @@ struct NotchView: View {
 }
 
 // MARK: - Composants
+
+struct WeatherBadge: View {
+    let report: WeatherReport
+
+    var body: some View {
+        HStack(spacing: 5) {
+            Image(systemName: report.symbol)
+                .symbolRenderingMode(.multicolor)
+                .font(.system(size: 14))
+            Text(report.temperatureText)
+                .font(.system(size: 13, weight: .semibold))
+                .monospacedDigit()
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(report.label), \(report.temperatureText)")
+    }
+}
 
 struct ControlButton: View {
     let symbol: String

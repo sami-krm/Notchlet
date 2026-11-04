@@ -59,6 +59,12 @@ enum SettingsKey {
     static let hourlyChimeEnabled = "hourlyChimeEnabled"
     static let hiddenCalendarIDs = "hiddenCalendarIDs"
 
+    // Désactivés par défaut : les activer déclenche une demande de permission.
+    static let weatherEnabled = "weatherEnabled"
+    static let liveWaveformEnabled = "liveWaveformEnabled"
+
+    static let shelfEnabled = "shelfEnabled"
+
     /// Valeurs utilisées tant que l'utilisateur n'a rien changé.
     static let defaults: [String: Any] = [
         expandOnHover: true,
@@ -101,6 +107,9 @@ enum SettingsKey {
         calendarAlertDuration: 5.0,
         calendarSoundEnabled: true,
         hourlyChimeEnabled: false,
+        weatherEnabled: false,
+        liveWaveformEnabled: false,
+        shelfEnabled: true,
     ]
 }
 

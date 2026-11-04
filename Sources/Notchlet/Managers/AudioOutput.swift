@@ -68,4 +68,14 @@ enum AudioOutput {
         guard AudioObjectGetPropertyData(device, &property, 0, nil, &size, &name) == noErr else { return nil }
         return name?.takeRetainedValue() as String?
     }
+
+    /// Identifiant stable de la sortie, nécessaire pour capturer le son du système.
+    static var deviceUID: String? {
+        guard let device else { return nil }
+        var uid: Unmanaged<CFString>?
+        var size = UInt32(MemoryLayout<Unmanaged<CFString>?>.size)
+        var property = address(kAudioDevicePropertyDeviceUID, scope: kAudioObjectPropertyScopeGlobal)
+        guard AudioObjectGetPropertyData(device, &property, 0, nil, &size, &uid) == noErr else { return nil }
+        return uid?.takeRetainedValue() as String?
+    }
 }

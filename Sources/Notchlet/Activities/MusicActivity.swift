@@ -3,13 +3,15 @@ import SwiftUI
 /// Activité de fond : le morceau en cours, de chaque côté de l'encoche.
 struct MusicActivity: Activity {
     let media: MediaManager
+    let levels: AudioLevelManager
 
     let id = "music"
-    var closedView: AnyView { AnyView(MusicClosedView(media: media)) }
+    var closedView: AnyView { AnyView(MusicClosedView(media: media, levels: levels)) }
 }
 
 private struct MusicClosedView: View {
     @ObservedObject var media: MediaManager
+    let levels: AudioLevelManager
     @AppStorage(SettingsKey.musicColorStyle) private var style = MusicColorStyle.artwork
 
     var body: some View {
@@ -17,8 +19,31 @@ private struct MusicClosedView: View {
             HStack {
                 ArtworkImage(media: media, size: 20, cornerRadius: 4)
                 Spacer()
-                EqualizerBars(isPlaying: media.isPlaying, color: style.accent(from: media.accentColor))
+                MusicBars(levels: levels, isPlaying: media.isPlaying, color: style.accent(from: media.accentColor))
             }
+        }
+    }
+}
+
+/// L'onde sonore réelle si la capture tourne, sinon l'égaliseur animé.
+struct MusicBars: View {
+    @ObservedObject var levels: AudioLevelManager
+    let isPlaying: Bool
+    let color: Color
+
+    var body: some View {
+        if levels.isCapturing {
+            HStack(spacing: 2) {
+                ForEach(levels.levels.indices, id: \.self) { index in
+                    Capsule()
+                        .fill(color)
+                        .frame(width: 3, height: 3 + 13 * CGFloat(levels.levels[index]))
+                }
+            }
+            .frame(height: 16)
+            .animation(.linear(duration: 0.08), value: levels.levels)
+        } else {
+            EqualizerBars(isPlaying: isPlaying, color: color)
         }
     }
 }

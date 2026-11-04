@@ -25,6 +25,8 @@ final class NotchWindowController: NSObject {
     private var scrollMonitors: [Any] = []
     /// Jusqu'à cette date, l'île reste ouverte même sans la souris (aperçu rapide).
     private var peekEnd = Date.distantPast
+    /// Dernier état connu du presse-papiers de glissement, pour repérer un nouveau glissement.
+    private var lastDragChange = 0
 
     override init() {
         screen = NotchGeometry.targetScreen()
@@ -53,7 +55,9 @@ final class NotchWindowController: NSObject {
             vm: viewModel,
             media: viewModel.media,
             battery: viewModel.battery,
-            calendar: viewModel.calendar
+            calendar: viewModel.calendar,
+            weather: viewModel.weather,
+            shelf: viewModel.shelf
         ))
         host.sizingOptions = []
         panel.contentView = host
@@ -76,12 +80,14 @@ final class NotchWindowController: NSObject {
         viewModel.startHUD()
         viewModel.startBluetooth()
         viewModel.startCalendar()
+        viewModel.startWeatherAndAudio()
         viewModel.media.onTrackChanged = { [weak self] in self?.showQuickPeek() }
     }
 
     var hud: HUDManager { viewModel.hud }
     var bluetooth: BluetoothManager { viewModel.bluetooth }
     var calendar: CalendarManager { viewModel.calendar }
+    var weather: WeatherManager { viewModel.weather }
 
     @objc private func applySettings() {
         // Sans `.fullScreenAuxiliary`, macOS n'affiche pas la fenêtre dans les espaces plein écran.
@@ -123,6 +129,7 @@ final class NotchWindowController: NSObject {
         // Île masquée (plein écran) : le survol ne doit rien déclencher.
         guard panel.isOnActiveSpace else { return }
         let isInZone = activeZone.contains(NSEvent.mouseLocation)
+        detectFileDrag(isInZone: isInZone)
 
         let defaults = UserDefaults.standard
 
@@ -139,6 +146,23 @@ final class NotchWindowController: NSObject {
         case .open:
             if !isInZone && Date() >= peekEnd { setState(.closed) }
         }
+    }
+
+    /// Fermée, l'île ignore la souris et ne recevrait pas un fichier glissé : on repère le
+    /// glissement ici, puis on l'ouvre sur l'étagère. On lit seulement le type du contenu.
+    private func detectFileDrag(isInZone: Bool) {
+        let board = NSPasteboard(name: .drag)
+        guard NSEvent.pressedMouseButtons != 0 else {
+            lastDragChange = board.changeCount
+            return
+        }
+        guard isInZone, board.changeCount != lastDragChange,
+              UserDefaults.standard.bool(forKey: SettingsKey.shelfEnabled),
+              board.canReadObject(forClasses: [NSURL.self], options: [.urlReadingFileURLsOnly: true])
+        else { return }
+        lastDragChange = board.changeCount
+        setState(.open)
+        viewModel.showsShelf = true
     }
 
     /// Ouvre l'île quelques secondes quand le morceau change.
@@ -188,6 +212,7 @@ final class NotchWindowController: NSObject {
         } else {
             viewModel.showsVolumeControl = false
             viewModel.showsCalendar = false
+            viewModel.showsShelf = false
         }
     }
 

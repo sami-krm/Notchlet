@@ -33,6 +33,7 @@ Sources/Notchlet/
     NotchView.swift             Interface SwiftUI de l'île
     MusicOpenView.swift         Île ouverte avec musique, commandes, ligne de volume
     CalendarOpenView.swift      Île ouverte avec les prochains événements, bouton « Rejoindre »
+    ShelfOpenView.swift         Île ouverte avec l'étagère de fichiers
   Activities/
     Activity.swift              Protocole commun des activités
     MusicActivity.swift         Morceau en cours dans l'île fermée, barre de progression
@@ -50,16 +51,20 @@ Sources/Notchlet/
     BluetoothManager.swift      Connexions (IOBluetooth, permission Bluetooth), batterie (system_profiler)
     CalendarManager.swift       Événements et rappels (EventKit, permission Calendrier), liens de visio
     ChimeManager.swift          Carillon à chaque heure
+    WeatherManager.swift        Météo (CoreLocation, Open-Meteo, position arrondie)
+    AudioLevelManager.swift     Niveau du son (tap Core Audio, macOS 14.2+, permission audio)
+    ShelfManager.swift          Étagère de fichiers (raccourcis gardés le temps de la session)
   Private/
     DisplayBrightness.swift     Luminosité (API privée DisplayServices, chargée avec dlopen)
   SettingsUI/
     SettingsWindowController.swift Fenêtre de réglages (NSWindow)
-    SettingsView.swift          Barre latérale et rubriques (Général, Batterie, Appareils, Luminosité, Volume, Lecture en cours, Calendrier, À propos)
+    SettingsView.swift          Barre latérale et rubriques (Général, Batterie, Appareils, Luminosité, Volume, Lecture en cours, Calendrier, Météo, Étagère, À propos)
     SettingsComponents.swift    Cartes, lignes, curseurs, tuiles de choix, couleur d'accent
 Tests/NotchletTests/        Tests unitaires
 ```
 `Private/` regroupe le code des API privées : chaque fonction est désactivable et laisse macOS reprendre la main si l'API disparaît. Une rubrique ou un réglage ne s'ajoute qu'avec la fonctionnalité qu'il règle : pas d'interrupteur sans effet.
 Design : même organisation qu'Alcove (barre latérale, cartes, tuiles, île centrée sur la musique), mais identité propre : textes en français, symboles Apple, accent ambre (`NotchletStyle.accent`). Seule la taille de l'île ouverte reprend, à ma demande, celle mesurée sur Alcove (345 × 174 points, 205 avec le volume). Aucune ressource d'Alcove.
+`Config/Info.plist` complète le fichier généré par Xcode, pour les textes de permission qu'il ne gère pas (capture audio).
 La signature de développement est dans `Config/Signing.xcconfig` (ad hoc par défaut). Le certificat et l'identifiant d'équipe restent dans `Config/Signing.local.xcconfig`, ignoré par Git : ils ne doivent pas arriver dans le dépôt public.
 Règles :
 - **Un fichier par service** (`CalendarManager`, `HUDManager`, `BluetoothManager`…), chacun en `ObservableObject` avec des propriétés `@Published`.
@@ -78,8 +83,8 @@ Règles :
 5. **Étape 5** : AirPods et appareils Bluetooth (batterie, animation).
 6. **Étape 6** : première version publique. GitHub Releases, licence, guide d'installation.
 7. **Étape 7** : calendrier avec EventKit (événements à venir, rappel, bouton « Rejoindre » pour Meet, Teams, Zoom et Webex). Carillon horaire. Notifications de l'île avec durées réglables.
-8. **Étape 8** : météo (API gratuite comme Open-Meteo), onde sonore en direct (capture audio), étagère de fichiers, modes de concentration.
-9. **Étape 9** : API privées, fragiles : lecture système, onglets de navigateur, écran verrouillé.
+8. **Étape 8** : météo (Open-Meteo, position automatique arrondie), onde sonore en direct (capture audio), étagère de fichiers.
+9. **Étape 9** : API privées ou non documentées, fragiles : lecture système, onglets de navigateur, modes de concentration, écran verrouillé.
 
 À chaque étape, on livre une version qui compile et qui marche avant de passer à la suivante.
 

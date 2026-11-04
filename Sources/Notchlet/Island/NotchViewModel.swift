@@ -13,7 +13,11 @@ final class NotchViewModel: NSObject, ObservableObject {
     @Published var showsVolumeControl = false
     /// Avec de la musique, affiche les événements à la place du lecteur.
     @Published var showsCalendar = false
+    @Published var showsShelf = false
 
+    let audioLevel = AudioLevelManager()
+    let weather = WeatherManager()
+    let shelf = ShelfManager()
     let calendar = CalendarManager()
     let chime = ChimeManager()
     let media = MediaManager()
@@ -64,7 +68,16 @@ final class NotchViewModel: NSObject, ObservableObject {
         if idle == IdleActivity.calendar.rawValue, calendar.nextTimedEvent() != nil {
             return CalendarIdleActivity(calendar: calendar)
         }
-        return media.track == nil ? nil : MusicActivity(media: media)
+        return media.track == nil ? nil : MusicActivity(media: media, levels: audioLevel)
+    }
+
+    func startWeatherAndAudio() {
+        weather.start()
+        audioLevel.start()
+        media.onPlaybackChanged = { [weak self] in
+            guard let self else { return }
+            self.audioLevel.setPlaying(self.media.isPlaying)
+        }
     }
 
     /// Sans musique, les événements s'affichent d'office ; avec musique, à la demande.

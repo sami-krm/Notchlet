@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Une rubrique de la barre latérale. Une rubrique s'ajoute avec la fonctionnalité qu'elle règle.
 enum SettingsPage: String, CaseIterable, Identifiable {
-    case general, battery, devices, brightness, volume, nowPlaying, calendar, about
+    case general, battery, devices, brightness, volume, nowPlaying, calendar, weather, shelf, about
 
     var id: String { rawValue }
 
@@ -15,6 +15,8 @@ enum SettingsPage: String, CaseIterable, Identifiable {
         case .volume: return "Volume"
         case .nowPlaying: return "Lecture en cours"
         case .calendar: return "Calendrier"
+        case .weather: return "Météo"
+        case .shelf: return "Étagère"
         case .about: return "À propos"
         }
     }
@@ -28,6 +30,8 @@ enum SettingsPage: String, CaseIterable, Identifiable {
         case .volume: return "speaker.wave.2.fill"
         case .nowPlaying: return "play.fill"
         case .calendar: return "calendar"
+        case .weather: return "cloud.sun.fill"
+        case .shelf: return "tray.full.fill"
         case .about: return "info"
         }
     }
@@ -41,6 +45,8 @@ enum SettingsPage: String, CaseIterable, Identifiable {
         case .volume: return [Color(red: 0.62, green: 0.52, blue: 0.98), Color(red: 0.42, green: 0.30, blue: 0.88)]
         case .nowPlaying: return [Color(red: 1.00, green: 0.45, blue: 0.45), Color(red: 0.88, green: 0.22, blue: 0.32)]
         case .calendar: return [Color(red: 0.32, green: 0.80, blue: 0.82), Color(red: 0.12, green: 0.58, blue: 0.66)]
+        case .weather: return [Color(red: 0.45, green: 0.75, blue: 1.00), Color(red: 0.22, green: 0.52, blue: 0.92)]
+        case .shelf: return [Color(red: 0.86, green: 0.66, blue: 0.42), Color(red: 0.68, green: 0.46, blue: 0.24)]
         case .about: return [Color(white: 0.55), Color(white: 0.38)]
         }
     }
@@ -49,7 +55,7 @@ enum SettingsPage: String, CaseIterable, Identifiable {
     static let groups: [(title: String?, pages: [SettingsPage])] = [
         (nil, [.general]),
         ("Notifications", [.battery, .devices, .brightness, .volume]),
-        ("Activités", [.nowPlaying, .calendar]),
+        ("Activités", [.nowPlaying, .calendar, .weather, .shelf]),
         ("Notchlet", [.about]),
     ]
 }
@@ -58,6 +64,7 @@ struct SettingsView: View {
     let hud: HUDManager
     let bluetooth: BluetoothManager
     let calendar: CalendarManager
+    let weather: WeatherManager
     @State var page: SettingsPage = .general
 
     var body: some View {
@@ -133,6 +140,8 @@ struct SettingsView: View {
                     case .volume: VolumePage(hud: hud)
                     case .nowPlaying: NowPlayingPage()
                     case .calendar: CalendarPage(calendar: calendar)
+                    case .weather: WeatherPage(weather: weather)
+                    case .shelf: ShelfPage()
                     case .about: AboutPage()
                     }
                 }
@@ -418,8 +427,21 @@ private struct NowPlayingPage: View {
     @AppStorage(SettingsKey.musicSideButton) private var sideButton = MusicSideButton.shuffle
     @AppStorage(SettingsKey.quickPeekEnabled) private var quickPeek = true
     @AppStorage(SettingsKey.quickPeekDuration) private var peekDuration = 2.0
+    @AppStorage(SettingsKey.liveWaveformEnabled) private var liveWaveform = false
 
     var body: some View {
+        SettingsSectionTitle(title: "Onde sonore")
+        SettingsCard {
+            SettingsToggleRow(title: "Suivre le son réel du Mac", isOn: $liveWaveform)
+                .disabled(!AudioLevelManager.isSupported)
+        }
+        Text(AudioLevelManager.isSupported
+             ? "macOS demande la permission de capturer l'audio, et signale la capture pendant la lecture. Seul le niveau du son est calculé : rien n'est enregistré ni envoyé. Si l'onde reste plate, autorise Notchlet dans Réglages Système > Confidentialité et sécurité."
+             : "Nécessite macOS 14.2 ou plus récent. L'égaliseur animé reste affiché.")
+            .font(.system(size: 12))
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
         SettingsSectionTitle(title: "Style de couleur")
         SettingsCard {
             SettingsTilePicker(options: MusicColorStyle.allCases, selection: $style, label: \.label) { option in
@@ -517,6 +539,63 @@ private struct CalendarPage: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Météo
+
+private struct WeatherPage: View {
+    @ObservedObject var weather: WeatherManager
+    @AppStorage(SettingsKey.weatherEnabled) private var isEnabled = false
+
+    var body: some View {
+        SettingsCard {
+            SettingsToggleRow(title: "Afficher la météo dans l'île", isOn: $isEnabled)
+            if isEnabled && weather.isDenied {
+                SettingsDivider()
+                PermissionRow(
+                    message: "Autorise Notchlet dans Réglages Système > Confidentialité et sécurité > Service de localisation.",
+                    action: weather.openPermissionSettings
+                )
+            }
+            if isEnabled, let report = weather.report {
+                SettingsDivider()
+                HStack {
+                    Text(report.label)
+                    Spacer()
+                    WeatherBadge(report: report)
+                }
+                .padding(.horizontal, 14)
+                .frame(minHeight: 44)
+            }
+            if isEnabled, !weather.isDenied, let error = weather.errorMessage {
+                SettingsDivider()
+                Text(error)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(14)
+            }
+        }
+        Text("Ta position, arrondie à environ 1 km, est envoyée au service gratuit Open-Meteo toutes les 30 minutes. La météo s'affiche dans l'île ouverte quand aucune musique ne joue.")
+            .font(.system(size: 12))
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+// MARK: - Étagère
+
+private struct ShelfPage: View {
+    @AppStorage(SettingsKey.shelfEnabled) private var isEnabled = true
+
+    var body: some View {
+        SettingsCard {
+            SettingsToggleRow(title: "Activer l'étagère de fichiers", isOn: $isEnabled)
+        }
+        Text("Glisse un fichier vers l'encoche pour le déposer. Double-clique dessus pour l'ouvrir, ou fais-le glisser ailleurs. L'étagère garde de simples raccourcis jusqu'à la fermeture de l'app : tes fichiers ne sont ni copiés, ni déplacés, ni supprimés.")
+            .font(.system(size: 12))
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

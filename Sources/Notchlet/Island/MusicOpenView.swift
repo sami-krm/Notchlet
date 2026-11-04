@@ -25,7 +25,7 @@ struct MusicOpenView: View {
                 }
                 .padding(.bottom, 4)
                 Spacer(minLength: 8)
-                EqualizerBars(isPlaying: media.isPlaying, color: accent)
+                MusicBars(levels: vm.audioLevel, isPlaying: media.isPlaying, color: accent)
                     .padding(.bottom, 8)
             }
 

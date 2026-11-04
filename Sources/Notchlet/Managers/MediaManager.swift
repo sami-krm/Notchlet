@@ -35,7 +35,13 @@ struct PlaybackProgress: Equatable {
 @MainActor
 final class MediaManager: NSObject, ObservableObject {
     @Published private(set) var track: Track?
-    @Published private(set) var isPlaying = false
+    @Published private(set) var isPlaying = false {
+        didSet {
+            if isPlaying != oldValue { onPlaybackChanged?() }
+        }
+    }
+    /// Appelé quand la lecture démarre ou s'arrête.
+    var onPlaybackChanged: (@MainActor () -> Void)?
     @Published private(set) var progress: PlaybackProgress?
     @Published private(set) var artwork: NSImage?
     /// Couleur dominante de la pochette, assez vive pour rester lisible sur fond noir.
