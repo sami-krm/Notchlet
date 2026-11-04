@@ -6,8 +6,10 @@ Une « Dynamic Island » pour Mac, en Swift, SwiftUI et AppKit. Ce projet person
 
 - Une île noire posée sur l'encoche, ou une pilule simulée en haut de l'écran sur les Mac sans encoche.
 - **Survol** : après un délai réglable, l'île s'ouvre avec une animation « spring ». Elle se referme quand la souris s'éloigne.
-- **Live activity** : quand Spotify ou Musique joue, l'île s'élargit et affiche l'icône de l'app à gauche et un égaliseur animé à droite.
-- **Vue ouverte** : date, batterie, morceau en cours avec précédent / lecture-pause / suivant, et l'heure.
+- **Live activity** : quand Spotify ou Musique joue, l'île s'élargit et affiche la pochette à gauche et un égaliseur animé à droite.
+- **Vue ouverte** : date, batterie, pochette, morceau en cours avec précédent / lecture-pause / suivant, barre de progression (clique ou fais-la glisser pour avancer ou reculer), et l'heure.
+- **Styles de couleur** : pochette (fond flou), coloré (couleur de la pochette sur l'égaliseur et la progression), dégradé (fond coloré), monochrome (noir et blanc).
+- **Gestes au trackpad**, à deux doigts sur l'île : vers le bas pour ouvrir, vers le haut pour fermer, vers la gauche pour le morceau suivant, vers la droite pour le précédent.
 - Une icône dans la barre des menus donne accès aux réglages et permet de quitter l'app.
 
 ## Réglages
@@ -18,14 +20,17 @@ Ouvre-les depuis l'icône de la barre des menus, avec **Réglages…**.
 - **Délai de survol** : de 0 à 1 seconde (0,2 seconde par défaut).
 - **Écran** : automatique (l'écran à encoche, sinon l'écran principal) ou un écran précis.
 - **Masquer l'île en plein écran** : activé par défaut. L'île disparaît des apps en plein écran au sens de macOS, c'est-à-dire qui occupent leur propre espace.
+- **Style de couleur** : dans l'onglet Lecture en cours.
 
 ## Permissions
 
 | Permission | Pourquoi | Où la gérer |
 |---|---|---|
-| Automatisation | Contrôler Spotify ou Musique (lecture-pause, morceau suivant ou précédent) | Réglages Système > Confidentialité et sécurité > Automatisation |
+| Automatisation | Lire la pochette et la position, et contrôler Spotify ou Musique | Réglages Système > Confidentialité et sécurité > Automatisation |
 
-macOS la demande au premier clic sur un bouton de lecture. L'autorisation concerne désormais l'app DynamicNotch, et non plus Xcode ou Terminal.
+macOS la demande dès le premier morceau détecté. Sans elle, l'île affiche l'icône de l'app au lieu de la pochette, sans barre de progression, et les boutons restent sans effet.
+
+Les gestes ne demandent aucune permission. Pour Spotify, la pochette est téléchargée depuis l'adresse HTTPS fournie par l'app.
 
 ## Lancer le projet
 

@@ -20,7 +20,7 @@ final class ActivityQueueTests: XCTestCase {
 
     func testBriefActivityReplacesMusicThenMusicComesBack() {
         let vm = makeViewModel()
-        vm.media.handle(["Player State": "Playing", "Name": "Titre"], bundleID: "com.spotify.client")
+        vm.media.applyState(["Player State": "Playing", "Name": "Titre"], bundleID: "com.spotify.client")
         XCTAssertEqual(vm.displayed?.id, "music")
 
         vm.enqueue(BriefActivity(id: "brief"))

@@ -25,20 +25,22 @@ Sources/DynamicNotch/
     NotchWindowController.swift NSPanel transparent au-dessus de la barre des menus, survol
     NotchGeometry.swift         Taille de l'encoche réelle ou simulée, écran utilisé
     HoverTimer.swift            Délai de survol avant l'ouverture
+    SwipeDetector.swift         Reconnaissance des balayages au trackpad
   Island/
     NotchViewModel.swift        État de l'île, tailles, rayons, file d'activités
     NotchShape.swift            Forme animable de l'île
     NotchView.swift             Interface SwiftUI
   Activities/
     Activity.swift              Protocole commun des activités
-    MusicActivity.swift         Morceau en cours dans l'île fermée
+    MusicActivity.swift         Morceau en cours dans l'île fermée, barre de progression
+    MusicColorStyle.swift       Styles de couleur, pochette et fond de l'île
   Managers/
-    MediaManager.swift          Musique (notifications Spotify/Musique, commandes AppleScript)
+    MediaManager.swift          Musique (notifications Spotify/Musique, AppleScript via osascript, hors du thread principal)
     BatteryManager.swift        Batterie (IOKit)
     LaunchAtLoginManager.swift  Lancement à l'ouverture de session (SMAppService)
   SettingsUI/
     SettingsWindowController.swift Fenêtre de réglages (NSWindow)
-    SettingsView.swift          Onglets Général et À propos
+    SettingsView.swift          Onglets Général, Lecture en cours et À propos
 Tests/DynamicNotchTests/        Tests unitaires
 ```
 Dossier à créer quand il servira : `Private/` (API privées, chaque fonction désactivable). Un onglet de réglages s'ajoute avec la fonctionnalité qu'il règle.

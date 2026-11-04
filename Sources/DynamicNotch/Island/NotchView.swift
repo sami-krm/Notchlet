@@ -22,7 +22,14 @@ struct NotchView: View {
                 }
             }
             .frame(width: size.width, height: size.height, alignment: .top)
-            .background(Color.black)
+            .background {
+                // Fermée, l'île reste noire pour se confondre avec l'encoche.
+                if vm.state == .open {
+                    MusicBackground(media: media)
+                } else {
+                    Color.black
+                }
+            }
             .clipShape(shape)
             .shadow(color: .black.opacity(vm.state == .open ? 0.45 : 0), radius: 14, y: 4)
 
@@ -78,20 +85,14 @@ struct NotchView: View {
 
 struct MediaCard: View {
     @ObservedObject var media: MediaManager
+    @AppStorage(SettingsKey.musicColorStyle) private var style = MusicColorStyle.artwork
 
     var body: some View {
         HStack(spacing: 12) {
             if let track = media.track {
-                Group {
-                    if let icon = media.icon(for: track.bundleID) {
-                        Image(nsImage: icon).resizable()
-                    } else {
-                        Image(systemName: "music.note")
-                    }
-                }
-                .frame(width: 56, height: 56)
+                ArtworkImage(media: media, size: 76, cornerRadius: 10)
 
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text(track.title)
                         .font(.system(size: 14, weight: .semibold))
                         .lineLimit(1)
@@ -105,7 +106,12 @@ struct MediaCard: View {
                         ControlButton(symbol: media.isPlaying ? "pause.fill" : "play.fill", size: 18) { media.playPause() }
                         ControlButton(symbol: "forward.fill") { media.next() }
                     }
-                    .padding(.top, 2)
+
+                    if let progress = media.progress {
+                        TrackProgressBar(progress: progress, isPlaying: media.isPlaying,
+                                         color: style.accent(from: media.accentColor),
+                                         onSeek: { media.seek(to: $0) })
+                    }
                 }
                 Spacer(minLength: 0)
             } else {

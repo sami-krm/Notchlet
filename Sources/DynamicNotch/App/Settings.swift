@@ -6,11 +6,13 @@ enum SettingsKey {
     /// Identifiant de l'écran choisi ; 0 signifie « automatique ».
     static let displayID = "displayID"
     static let hideInFullscreen = "hideInFullscreen"
+    static let musicColorStyle = "musicColorStyle"
 
     /// Valeurs utilisées tant que l'utilisateur n'a rien changé.
     static let defaults: [String: Any] = [
         hoverDelay: 0.2,
         displayID: 0,
         hideInFullscreen: true,
+        musicColorStyle: MusicColorStyle.artwork.rawValue,
     ]
 }

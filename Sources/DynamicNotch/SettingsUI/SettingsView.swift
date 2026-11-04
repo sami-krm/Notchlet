@@ -6,6 +6,8 @@ struct SettingsView: View {
         TabView {
             GeneralSettingsView()
                 .tabItem { Label("Général", systemImage: "gearshape") }
+            NowPlayingSettingsView()
+                .tabItem { Label("Lecture en cours", systemImage: "music.note") }
             AboutView()
                 .tabItem { Label("À propos", systemImage: "info.circle") }
         }
@@ -54,6 +56,23 @@ private struct GeneralSettingsView: View {
         }
         .formStyle(.grouped)
         .onAppear { launchAtLogin.refresh() }
+    }
+}
+
+private struct NowPlayingSettingsView: View {
+    @AppStorage(SettingsKey.musicColorStyle) private var style = MusicColorStyle.artwork
+
+    var body: some View {
+        Form {
+            Picker("Style de couleur", selection: $style) {
+                ForEach(MusicColorStyle.allCases) { Text($0.label).tag($0) }
+            }
+            Section("Gestes au trackpad, à deux doigts sur l'île") {
+                LabeledContent("Vers le bas ou le haut", value: "Ouvrir ou fermer")
+                LabeledContent("Vers la gauche ou la droite", value: "Morceau suivant ou précédent")
+            }
+        }
+        .formStyle(.grouped)
     }
 }
 
