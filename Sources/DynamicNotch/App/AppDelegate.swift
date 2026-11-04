@@ -1,10 +1,14 @@
 import AppKit
 
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var notchController: NotchWindowController?
     private var statusItem: NSStatusItem?
+    private let settingsWindow = SettingsWindowController()
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        UserDefaults.standard.register(defaults: SettingsKey.defaults)
+
         let controller = NotchWindowController()
         controller.show()
         notchController = controller
@@ -20,16 +24,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         )
     }
 
-    @MainActor @objc private func screensChanged() {
+    @objc private func screensChanged() {
         notchController?.reposition()
     }
 
-    /// Petite icône dans la barre des menus, juste pour pouvoir quitter l'app.
+    @objc private func openSettings() {
+        settingsWindow.show()
+    }
+
+    /// Petite icône dans la barre des menus : réglages et sortie de l'app.
     private func setupStatusItem() {
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         item.button?.image = NSImage(systemSymbolName: "capsule.fill", accessibilityDescription: "DynamicNotch")
 
         let menu = NSMenu()
+        let settingsItem = NSMenuItem(title: "Réglages…", action: #selector(openSettings), keyEquivalent: ",")
+        settingsItem.target = self
+        menu.addItem(settingsItem)
+        menu.addItem(.separator())
         menu.addItem(NSMenuItem(title: "Quitter DynamicNotch",
                                 action: #selector(NSApplication.terminate(_:)),
                                 keyEquivalent: "q"))

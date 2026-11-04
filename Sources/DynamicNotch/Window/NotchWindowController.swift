@@ -16,6 +16,7 @@ final class NotchWindowController: NSObject {
     private let viewModel: NotchViewModel
     private var screen: NSScreen
     private var mouseTimer: Timer?
+    private var hoverTimer = HoverTimer()
 
     override init() {
         screen = NotchGeometry.targetScreen()
@@ -37,7 +38,6 @@ final class NotchWindowController: NSObject {
         panel.hidesOnDeactivate = false
         // Au-dessus de la barre des menus pour recouvrir l'encoche.
         panel.level = NSWindow.Level(rawValue: NSWindow.Level.mainMenu.rawValue + 3)
-        panel.collectionBehavior = [.canJoinAllSpaces, .stationary, .fullScreenAuxiliary, .ignoresCycle]
         // Fermée, l'île laisse passer les clics (la barre des menus reste utilisable).
         panel.ignoresMouseEvents = true
 
@@ -48,12 +48,30 @@ final class NotchWindowController: NSObject {
         ))
         host.sizingOptions = []
         panel.contentView = host
+
+        // Un réglage vient de changer : on l'applique tout de suite.
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(applySettings),
+            name: UserDefaults.didChangeNotification,
+            object: nil
+        )
     }
 
     func show() {
-        reposition()
+        applySettings()
         panel.orderFrontRegardless()
         startMouseTracking()
+    }
+
+    @objc private func applySettings() {
+        // Sans `.fullScreenAuxiliary`, macOS n'affiche pas la fenêtre dans les espaces plein écran.
+        var behavior: NSWindow.CollectionBehavior = [.canJoinAllSpaces, .stationary, .ignoresCycle]
+        if !UserDefaults.standard.bool(forKey: SettingsKey.hideInFullscreen) {
+            behavior.insert(.fullScreenAuxiliary)
+        }
+        panel.collectionBehavior = behavior
+        reposition()
     }
 
     func reposition() {
@@ -83,6 +101,8 @@ final class NotchWindowController: NSObject {
     }
 
     @objc private func pollMouse() {
+        // Île masquée (plein écran) : le survol ne doit rien déclencher.
+        guard panel.isOnActiveSpace else { return }
         let mouse = NSEvent.mouseLocation
         let frame = screen.frame
 
@@ -93,7 +113,10 @@ final class NotchWindowController: NSObject {
                                  y: frame.maxY - size.height - 4,
                                  width: size.width + 20,
                                  height: size.height + 10)
-            if hotZone.contains(mouse) { setState(.open) }
+            let delay = UserDefaults.standard.double(forKey: SettingsKey.hoverDelay)
+            if hoverTimer.update(isInside: hotZone.contains(mouse), now: Date(), delay: delay) {
+                setState(.open)
+            }
 
         case .open:
             let size = viewModel.openSize

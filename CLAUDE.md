@@ -23,7 +23,8 @@ Sources/DynamicNotch/
     Settings.swift              Clés @AppStorage
   Window/
     NotchWindowController.swift NSPanel transparent au-dessus de la barre des menus, survol
-    NotchGeometry.swift         Taille de l'encoche réelle ou simulée
+    NotchGeometry.swift         Taille de l'encoche réelle ou simulée, écran utilisé
+    HoverTimer.swift            Délai de survol avant l'ouverture
   Island/
     NotchViewModel.swift        État de l'île, tailles, rayons, file d'activités
     NotchShape.swift            Forme animable de l'île
@@ -34,9 +35,13 @@ Sources/DynamicNotch/
   Managers/
     MediaManager.swift          Musique (notifications Spotify/Musique, commandes AppleScript)
     BatteryManager.swift        Batterie (IOKit)
+    LaunchAtLoginManager.swift  Lancement à l'ouverture de session (SMAppService)
+  SettingsUI/
+    SettingsWindowController.swift Fenêtre de réglages (NSWindow)
+    SettingsView.swift          Onglets Général et À propos
 Tests/DynamicNotchTests/        Tests unitaires
 ```
-Dossiers à créer quand ils serviront : `SettingsUI/` (fenêtre de réglages) et `Private/` (API privées, chaque fonction désactivable).
+Dossier à créer quand il servira : `Private/` (API privées, chaque fonction désactivable). Un onglet de réglages s'ajoute avec la fonctionnalité qu'il règle.
 Règles :
 - **Un fichier par service** (`CalendarManager`, `HUDManager`, `BluetoothManager`…), chacun en `ObservableObject` avec des propriétés `@Published`.
 - **Une activité = un type** conforme au protocole `Activity`. Une activité brève (HUD, alerte) passe par la file du ViewModel : elle remplace l'activité de fond quelques secondes, puis celle-ci revient. Le mode « Duo » viendra plus tard.

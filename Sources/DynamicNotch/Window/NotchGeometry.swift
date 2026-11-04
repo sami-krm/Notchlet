@@ -26,10 +26,20 @@ struct NotchGeometry: Equatable {
         )
     }
 
-    /// Écran à utiliser : celui qui a une encoche, sinon l'écran principal.
+    /// Écran à utiliser : celui des réglages s'il est branché ; sinon celui qui a
+    /// une encoche, sinon l'écran principal.
     static func targetScreen() -> NSScreen {
-        NSScreen.screens.first(where: { $0.safeAreaInsets.top > 0 })
+        let chosenID = UserDefaults.standard.integer(forKey: SettingsKey.displayID)
+        return NSScreen.screens.first(where: { $0.displayID == chosenID })
+            ?? NSScreen.screens.first(where: { $0.safeAreaInsets.top > 0 })
             ?? NSScreen.main
             ?? NSScreen.screens[0]
+    }
+}
+
+extension NSScreen {
+    /// Numéro que macOS attribue à cet écran.
+    var displayID: Int {
+        (deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber)?.intValue ?? 0
     }
 }
