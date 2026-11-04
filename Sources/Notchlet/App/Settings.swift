@@ -65,6 +65,12 @@ enum SettingsKey {
 
     static let shelfEnabled = "shelfEnabled"
 
+    // Fonctions non documentées ou privées, désactivées par défaut.
+    static let focusEnabled = "focusEnabled"
+    static let incomingCallsEnabled = "incomingCallsEnabled"
+
+    static let callIndicatorEnabled = "callIndicatorEnabled"
+
     /// Valeurs utilisées tant que l'utilisateur n'a rien changé.
     static let defaults: [String: Any] = [
         expandOnHover: true,
@@ -110,6 +116,9 @@ enum SettingsKey {
         weatherEnabled: false,
         liveWaveformEnabled: false,
         shelfEnabled: true,
+        focusEnabled: false,
+        incomingCallsEnabled: false,
+        callIndicatorEnabled: true,
     ]
 }
 

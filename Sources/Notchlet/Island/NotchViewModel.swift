@@ -15,6 +15,8 @@ final class NotchViewModel: NSObject, ObservableObject {
     @Published var showsCalendar = false
     @Published var showsShelf = false
 
+    let calls = CallManager()
+    let focus = FocusManager()
     let audioLevel = AudioLevelManager()
     let weather = WeatherManager()
     let shelf = ShelfManager()
@@ -62,13 +64,24 @@ final class NotchViewModel: NSObject, ObservableObject {
     /// Une activité brève passe avant l'activité de fond, puis celle-ci revient.
     var displayed: (any Activity)? { transientQueue.first ?? background }
 
+    /// Un appel en cours passe avant les autres activités de fond.
+    var isCallActive: Bool { calls.callStart != nil || calls.incoming != nil }
+
     private var background: (any Activity)? {
+        if isCallActive { return CallActivity(calls: calls) }
         let idle = UserDefaults.standard.string(forKey: SettingsKey.idleActivity)
         if idle == IdleActivity.none.rawValue { return nil }
         if idle == IdleActivity.calendar.rawValue, calendar.nextTimedEvent() != nil {
             return CalendarIdleActivity(calendar: calendar)
         }
         return media.track == nil ? nil : MusicActivity(media: media, levels: audioLevel)
+    }
+
+    func startFocus() {
+        focus.onChange = { [weak self] mode in
+            self?.enqueue(FocusActivity(mode: mode))
+        }
+        focus.start()
     }
 
     func startWeatherAndAudio() {

@@ -34,6 +34,9 @@ Ouvre l'app seulement si tu fais confiance à sa source : télécharge-la depuis
 - **Carillon** (à activer dans la rubrique Calendrier) : un son de macOS à chaque heure pile.
 - **Météo** (à activer dans la rubrique Météo) : température et conditions locales dans l'île ouverte, quand aucune musique ne joue.
 - **Onde sonore** (à activer dans Lecture en cours, macOS 14.2 ou plus récent) : les barres suivent le niveau réel du son pendant la lecture.
+- **Modes de concentration** (à activer dans sa rubrique, avec l'Accès complet au disque) : l'île signale le début et la fin d'un mode. Fonction fragile : une concentration programmée peut ne pas être détectée.
+- **Appel en cours** (activé par défaut) : quand une app utilise le micro depuis quelques secondes, l'île affiche la durée et un bouton pour couper le micro. L'app ne sait pas s'il s'agit vraiment d'un appel : un mémo vocal ou la dictée l'allument aussi. Le son n'est jamais écouté.
+- **Appels entrants** (à activer dans la rubrique Appels, avec l'Accessibilité) : l'île s'ouvre sur le nom de l'appelant, avec les boutons Accepter et Refuser. Fonction fragile : elle lit les bannières de notification, dont le format n'est pas documenté. Rien n'est enregistré.
 - **Étagère de fichiers** : glisse un fichier vers l'encoche pour le déposer, double-clique pour l'ouvrir, ou fais-le glisser ailleurs. Elle garde de simples raccourcis jusqu'à la fermeture de l'app : les fichiers ne sont ni copiés, ni déplacés, ni supprimés.
 - Une icône dans la barre des menus donne accès aux réglages et permet de quitter l'app.
 
@@ -47,7 +50,7 @@ Ouvre-les depuis l'icône de la barre des menus, avec **Réglages…**.
 - **Luminosité** et **Volume** : remplacement du HUD de macOS, durée, style de barre (blanc, couleur d'accent, lumineux), pourcentage, vitesse d'animation, et sortie audio pour le volume.
 - **Lecture en cours** : style de couleur, bouton à gauche des commandes, aperçu rapide et sa durée.
 - **Calendrier** : affichage des événements, rappel avec son délai de 1 à 30 minutes (10 par défaut), sa durée et son son, carillon horaire, choix des calendriers.
-- **Météo** et **Étagère** : activation de chaque fonction.
+- **Concentration**, **Appels**, **Météo** et **Étagère** : activation de chaque fonction.
 - **À propos** : version et liens vers le projet.
 
 ## Permissions
@@ -55,15 +58,16 @@ Ouvre-les depuis l'icône de la barre des menus, avec **Réglages…**.
 | Permission | Pourquoi | Où la gérer |
 |---|---|---|
 | Automatisation | Lire la pochette et la position, et contrôler Spotify ou Musique | Réglages Système > Confidentialité et sécurité > Automatisation |
-| Accessibilité | Intercepter les touches de volume et de luminosité pour le HUD | Réglages Système > Confidentialité et sécurité > Accessibilité |
+| Accessibilité | Intercepter les touches de volume et de luminosité pour le HUD, lire les bannières d'appel entrant | Réglages Système > Confidentialité et sécurité > Accessibilité |
 | Bluetooth | Détecter la connexion des appareils | Réglages Système > Confidentialité et sécurité > Bluetooth |
 | Calendriers | Lire les prochains événements (aucune modification, rien n'est enregistré ni envoyé) | Réglages Système > Confidentialité et sécurité > Calendriers |
 | Localisation | Connaître la météo locale | Réglages Système > Confidentialité et sécurité > Service de localisation |
 | Capture audio | Mesurer le niveau du son pour l'onde sonore (rien n'est enregistré ni envoyé) | Réglages Système > Confidentialité et sécurité |
+| Accès complet au disque | Lire le mode de concentration actif. Cette permission couvre tous tes fichiers, mais Notchlet ne lit que deux fichiers de réglages de macOS | Réglages Système > Confidentialité et sécurité > Accès complet au disque |
 
 L'Automatisation est demandée dès le premier morceau détecté. Sans elle, l'île affiche l'icône de l'app au lieu de la pochette, sans barre de progression, et les boutons restent sans effet.
 
-L'Accessibilité n'est demandée que lorsque tu actives un HUD, le Bluetooth lorsque tu actives la rubrique Appareils, et les Calendriers lorsque tu actives leur rubrique. « Rejoindre » n'ouvre que des liens HTTPS vers les quatre services cités. La Localisation et la capture audio ne sont demandées que lorsque tu actives la météo ou l'onde sonore.
+L'Accessibilité n'est demandée que lorsque tu actives un HUD ou les appels entrants, le Bluetooth lorsque tu actives la rubrique Appareils, et les Calendriers lorsque tu actives leur rubrique. « Rejoindre » n'ouvre que des liens HTTPS vers les quatre services cités. La Localisation et la capture audio ne sont demandées que lorsque tu actives la météo ou l'onde sonore.
 
 **Service tiers :** une fois la météo activée, ta position, arrondie à environ 1 km, est envoyée à [Open-Meteo](https://open-meteo.com) toutes les 30 minutes et à chaque réveil du Mac. La batterie des appareils vient de l'outil système `system_profiler`, sans API privée, mais son format n'est pas documenté. Les gestes et les alertes de batterie ne demandent aucune permission.
 

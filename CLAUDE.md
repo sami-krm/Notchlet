@@ -41,6 +41,8 @@ Sources/Notchlet/
     BatteryAlertActivity.swift  Alertes de charge et de batterie faible
     HUDActivity.swift           HUD volume et luminosité, styles de barre, vitesse d'animation
     BluetoothActivity.swift     Connexion d'un appareil Bluetooth
+    FocusActivity.swift         Début et fin d'un mode de concentration
+    CallActivity.swift          Appel en cours ou entrant, dans l'île fermée et ouverte
     CalendarActivity.swift      Rappel d'événement et prochain événement dans l'île fermée
   Managers/
     MediaManager.swift          Musique (notifications Spotify/Musique, AppleScript via osascript, hors du thread principal)
@@ -54,11 +56,15 @@ Sources/Notchlet/
     WeatherManager.swift        Météo (CoreLocation, Open-Meteo, position arrondie)
     AudioLevelManager.swift     Niveau du son (tap Core Audio, macOS 14.2+, permission audio)
     ShelfManager.swift          Étagère de fichiers (raccourcis gardés le temps de la session)
+    FocusManager.swift          Suivi du mode de concentration, activé à la demande
+    CallManager.swift           Appel en cours (micro utilisé, Core Audio) et appel entrant
   Private/
     DisplayBrightness.swift     Luminosité (API privée DisplayServices, chargée avec dlopen)
+    FocusStatus.swift           Mode de concentration (fichiers non documentés, Accès complet au disque)
+    IncomingCallReader.swift    Bannières d'appel (structure d'accessibilité non documentée, permission Accessibilité)
   SettingsUI/
     SettingsWindowController.swift Fenêtre de réglages (NSWindow)
-    SettingsView.swift          Barre latérale et rubriques (Général, Batterie, Appareils, Luminosité, Volume, Lecture en cours, Calendrier, Météo, Étagère, À propos)
+    SettingsView.swift          Barre latérale et rubriques (Général, Batterie, Appareils, Appels, Concentration, Luminosité, Volume, Lecture en cours, Calendrier, Météo, Étagère, À propos)
     SettingsComponents.swift    Cartes, lignes, curseurs, tuiles de choix, couleur d'accent
 Tests/NotchletTests/        Tests unitaires
 ```
@@ -84,7 +90,7 @@ Règles :
 6. **Étape 6** : première version publique. GitHub Releases, licence, guide d'installation.
 7. **Étape 7** : calendrier avec EventKit (événements à venir, rappel, bouton « Rejoindre » pour Meet, Teams, Zoom et Webex). Carillon horaire. Notifications de l'île avec durées réglables.
 8. **Étape 8** : météo (Open-Meteo, position automatique arrondie), onde sonore en direct (capture audio), étagère de fichiers.
-9. **Étape 9** : API privées ou non documentées, fragiles : lecture système, onglets de navigateur, modes de concentration, écran verrouillé.
+9. **Étape 9** : API privées ou non documentées, fragiles : modes de concentration. Écartés à ma demande : lecteur sur écran verrouillé (boutons sans réaction), lecture système et onglets de navigateur, car ils imposent de contourner une restriction d'Apple depuis macOS 15.4.
 
 À chaque étape, on livre une version qui compile et qui marche avant de passer à la suivante.
 

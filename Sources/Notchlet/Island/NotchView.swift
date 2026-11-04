@@ -7,6 +7,7 @@ struct NotchView: View {
     @ObservedObject var calendar: CalendarManager
     @ObservedObject var weather: WeatherManager
     let shelf: ShelfManager
+    @ObservedObject var calls: CallManager
     @AppStorage(SettingsKey.shelfEnabled) private var shelfEnabled = true
 
     private let spring = Animation.spring(response: 0.42, dampingFraction: 0.78)
@@ -70,7 +71,10 @@ struct NotchView: View {
 
     private var openContent: some View {
         Group {
-            if vm.showsShelf {
+            if calls.incoming != nil || (calls.callStart != nil && !vm.showsShelf && !vm.showsCalendar) {
+                CallOpenView(calls: calls, horizontalPadding: 18 + vm.openTopRadius,
+                             topPadding: vm.geometry.notchSize.height + 6)
+            } else if vm.showsShelf {
                 ShelfOpenView(
                     shelf: shelf,
                     horizontalPadding: 18 + vm.openTopRadius,

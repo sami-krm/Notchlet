@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Une rubrique de la barre latérale. Une rubrique s'ajoute avec la fonctionnalité qu'elle règle.
 enum SettingsPage: String, CaseIterable, Identifiable {
-    case general, battery, devices, brightness, volume, nowPlaying, calendar, weather, shelf, about
+    case general, battery, devices, calls, focus, brightness, volume, nowPlaying, calendar, weather, shelf, about
 
     var id: String { rawValue }
 
@@ -17,6 +17,8 @@ enum SettingsPage: String, CaseIterable, Identifiable {
         case .calendar: return "Calendrier"
         case .weather: return "Météo"
         case .shelf: return "Étagère"
+        case .calls: return "Appels"
+        case .focus: return "Concentration"
         case .about: return "À propos"
         }
     }
@@ -32,6 +34,8 @@ enum SettingsPage: String, CaseIterable, Identifiable {
         case .calendar: return "calendar"
         case .weather: return "cloud.sun.fill"
         case .shelf: return "tray.full.fill"
+        case .calls: return "phone.fill"
+        case .focus: return "moon.fill"
         case .about: return "info"
         }
     }
@@ -47,6 +51,8 @@ enum SettingsPage: String, CaseIterable, Identifiable {
         case .calendar: return [Color(red: 0.32, green: 0.80, blue: 0.82), Color(red: 0.12, green: 0.58, blue: 0.66)]
         case .weather: return [Color(red: 0.45, green: 0.75, blue: 1.00), Color(red: 0.22, green: 0.52, blue: 0.92)]
         case .shelf: return [Color(red: 0.86, green: 0.66, blue: 0.42), Color(red: 0.68, green: 0.46, blue: 0.24)]
+        case .calls: return [Color(red: 0.40, green: 0.85, blue: 0.50), Color(red: 0.16, green: 0.62, blue: 0.30)]
+        case .focus: return [Color(red: 0.48, green: 0.45, blue: 0.95), Color(red: 0.30, green: 0.26, blue: 0.78)]
         case .about: return [Color(white: 0.55), Color(white: 0.38)]
         }
     }
@@ -54,7 +60,7 @@ enum SettingsPage: String, CaseIterable, Identifiable {
     /// Groupes de la barre latérale, avec leur titre éventuel.
     static let groups: [(title: String?, pages: [SettingsPage])] = [
         (nil, [.general]),
-        ("Notifications", [.battery, .devices, .brightness, .volume]),
+        ("Notifications", [.battery, .devices, .calls, .focus, .brightness, .volume]),
         ("Activités", [.nowPlaying, .calendar, .weather, .shelf]),
         ("Notchlet", [.about]),
     ]
@@ -65,6 +71,7 @@ struct SettingsView: View {
     let bluetooth: BluetoothManager
     let calendar: CalendarManager
     let weather: WeatherManager
+    let focus: FocusManager
     @State var page: SettingsPage = .general
 
     var body: some View {
@@ -142,6 +149,8 @@ struct SettingsView: View {
                     case .calendar: CalendarPage(calendar: calendar)
                     case .weather: WeatherPage(weather: weather)
                     case .shelf: ShelfPage()
+                    case .calls: CallsPage(hud: hud)
+                    case .focus: FocusPage(focus: focus)
                     case .about: AboutPage()
                     }
                 }
@@ -577,6 +586,76 @@ private struct WeatherPage: View {
             }
         }
         Text("Ta position, arrondie à environ 1 km, est envoyée au service gratuit Open-Meteo toutes les 30 minutes. La météo s'affiche dans l'île ouverte quand aucune musique ne joue.")
+            .font(.system(size: 12))
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+// MARK: - Appels
+
+private struct CallsPage: View {
+    @ObservedObject var hud: HUDManager
+    @AppStorage(SettingsKey.callIndicatorEnabled) private var indicator = true
+    @AppStorage(SettingsKey.incomingCallsEnabled) private var incoming = false
+
+    var body: some View {
+        SettingsCard {
+            SettingsToggleRow(title: "Signaler un appel en cours", isOn: $indicator)
+        }
+        Text("L'île s'allume quand une app utilise le micro depuis quelques secondes, avec la durée et un bouton pour couper le micro. L'app ne sait pas s'il s'agit vraiment d'un appel : une dictée ou un enregistrement l'activent aussi. Le son du micro n'est jamais écouté.")
+            .font(.system(size: 12))
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+        SettingsCard {
+            SettingsToggleRow(title: "Afficher les appels entrants", isOn: $incoming)
+                .onChange(of: incoming) { enabled in
+                    if enabled && !hud.isTrusted { hud.requestPermission() }
+                }
+            if incoming && !hud.isTrusted {
+                SettingsDivider()
+                PermissionRow(
+                    message: "Autorise Notchlet dans Réglages Système > Confidentialité et sécurité > Accessibilité.",
+                    action: hud.openPermissionSettings
+                )
+            }
+        }
+        Text("Fonction fragile : macOS ne donne pas accès aux appels. L'app lit les bannières de notification à l'écran chaque seconde, et ne retient que celles qui ont des boutons Accepter et Refuser. Une mise à jour de macOS peut la casser. Rien n'est enregistré.")
+            .font(.system(size: 12))
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+// MARK: - Concentration
+
+private struct FocusPage: View {
+    @ObservedObject var focus: FocusManager
+    @AppStorage(SettingsKey.focusEnabled) private var isEnabled = false
+
+    var body: some View {
+        SettingsCard {
+            SettingsToggleRow(title: "Signaler les modes de concentration", isOn: $isEnabled)
+            if isEnabled && focus.isDenied {
+                SettingsDivider()
+                PermissionRow(
+                    message: "Ajoute Notchlet dans Réglages Système > Confidentialité et sécurité > Accès complet au disque, puis relance l'app.",
+                    action: focus.openPermissionSettings
+                )
+            }
+            if isEnabled, let mode = focus.mode {
+                SettingsDivider()
+                HStack {
+                    Text("Mode actif")
+                    Spacer()
+                    Text(mode.name).foregroundStyle(.secondary)
+                }
+                .padding(.horizontal, 14)
+                .frame(minHeight: 44)
+            }
+        }
+        Text("Fonction fragile : Apple ne fournit pas d'API pour connaître le mode actif. L'Accès complet au disque donne à Notchlet un accès à tous tes fichiers, même s'il ne lit que deux fichiers de réglages de macOS. Une concentration programmée peut ne pas être détectée, et une mise à jour de macOS peut casser cette fonction.")
             .font(.system(size: 12))
             .foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)

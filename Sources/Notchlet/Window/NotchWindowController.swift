@@ -57,7 +57,8 @@ final class NotchWindowController: NSObject {
             battery: viewModel.battery,
             calendar: viewModel.calendar,
             weather: viewModel.weather,
-            shelf: viewModel.shelf
+            shelf: viewModel.shelf,
+            calls: viewModel.calls
         ))
         host.sizingOptions = []
         panel.contentView = host
@@ -81,6 +82,13 @@ final class NotchWindowController: NSObject {
         viewModel.startBluetooth()
         viewModel.startCalendar()
         viewModel.startWeatherAndAudio()
+        viewModel.startFocus()
+        viewModel.calls.start()
+        // L'île reste ouverte tant que l'appel sonne : les boutons doivent rester accessibles.
+        viewModel.calls.onIncoming = { [weak self] in
+            self?.peekEnd = Date().addingTimeInterval(30)
+            self?.setState(.open)
+        }
         viewModel.media.onTrackChanged = { [weak self] in self?.showQuickPeek() }
     }
 
@@ -88,6 +96,7 @@ final class NotchWindowController: NSObject {
     var bluetooth: BluetoothManager { viewModel.bluetooth }
     var calendar: CalendarManager { viewModel.calendar }
     var weather: WeatherManager { viewModel.weather }
+    var focus: FocusManager { viewModel.focus }
 
     @objc private func applySettings() {
         // Sans `.fullScreenAuxiliary`, macOS n'affiche pas la fenêtre dans les espaces plein écran.

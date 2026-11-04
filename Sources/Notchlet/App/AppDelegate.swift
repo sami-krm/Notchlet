@@ -13,7 +13,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         controller.show()
         notchController = controller
         settingsWindow = SettingsWindowController(hud: controller.hud, bluetooth: controller.bluetooth,
-                                                  calendar: controller.calendar, weather: controller.weather)
+                                                  calendar: controller.calendar, weather: controller.weather,
+                                                  focus: controller.focus)
 
         setupStatusItem()
 
