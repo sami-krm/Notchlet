@@ -24,7 +24,7 @@ private struct MusicClosedView: View {
 }
 
 /// Petites barres animées façon égaliseur.
-private struct EqualizerBars: View {
+struct EqualizerBars: View {
     var isPlaying: Bool
     var color: Color
 
@@ -83,7 +83,8 @@ struct TrackProgressBar: View {
                     )
                 }
                 .frame(height: 14)
-                time(progress.duration)
+                // Le temps restant, comme dans la plupart des lecteurs.
+                time(progress.duration - position, prefix: "-")
             }
         }
     }
@@ -92,9 +93,9 @@ struct TrackProgressBar: View {
         progress.duration * min(max(x / width, 0), 1)
     }
 
-    private func time(_ seconds: TimeInterval) -> some View {
-        Text(Duration.seconds(seconds), format: .time(pattern: .minuteSecond))
-            .font(.system(size: 10, weight: .medium))
+    private func time(_ seconds: TimeInterval, prefix: String = "") -> some View {
+        Text(prefix + Duration.seconds(seconds).formatted(.time(pattern: .minuteSecond)))
+            .font(.system(size: 11, weight: .medium))
             .monospacedDigit()
             .foregroundStyle(.white.opacity(0.7))
     }

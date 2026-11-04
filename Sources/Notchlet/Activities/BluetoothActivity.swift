@@ -5,9 +5,10 @@ struct BluetoothActivity: Activity {
     let deviceName: String
     let battery: BluetoothBattery
     let minorType: String?
+    var duration: TimeInterval = 4
 
     var id: String { "bluetooth.\(deviceName)" }
-    var displayDuration: TimeInterval { 4 }
+    var displayDuration: TimeInterval { duration }
     var closedWing: CGFloat { 50 }
 
     var closedView: AnyView {

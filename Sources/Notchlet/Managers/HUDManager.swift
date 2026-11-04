@@ -65,7 +65,9 @@ final class HUDManager: NSObject, ObservableObject {
     /// Démarre ou arrête l'interception selon le réglage et la permission. Appelée aussi
     /// régulièrement : macOS ne prévient pas quand la permission change.
     @objc private func applySettings() {
-        let enabled = UserDefaults.standard.bool(forKey: SettingsKey.hudEnabled)
+        let defaults = UserDefaults.standard
+        let enabled = defaults.bool(forKey: SettingsKey.volumeHUDEnabled)
+            || defaults.bool(forKey: SettingsKey.brightnessHUDEnabled)
         let trusted = AXIsProcessTrusted()
         if trusted != isTrusted { isTrusted = trusted }
 
@@ -149,14 +151,14 @@ final class HUDManager: NSObject, ObservableObject {
     }
 
     private func canHandle(_ kind: MediaKey.Kind) -> Bool {
+        let defaults = UserDefaults.standard
         switch kind {
         case .volumeUp, .volumeDown:
-            return AudioOutput.canChangeVolume
+            return defaults.bool(forKey: SettingsKey.volumeHUDEnabled) && AudioOutput.canChangeVolume
         case .mute:
-            return AudioOutput.canMute
+            return defaults.bool(forKey: SettingsKey.volumeHUDEnabled) && AudioOutput.canMute
         case .brightnessUp, .brightnessDown:
-            return UserDefaults.standard.bool(forKey: SettingsKey.brightnessHUDEnabled)
-                && DisplayBrightness.level != nil
+            return defaults.bool(forKey: SettingsKey.brightnessHUDEnabled) && DisplayBrightness.level != nil
         }
     }
 
@@ -179,13 +181,19 @@ final class HUDManager: NSObject, ObservableObject {
             guard let brightness = DisplayBrightness.level else { return }
             let new = HUDActivity.steppedLevel(brightness, up: kind == .brightnessUp)
             DisplayBrightness.setLevel(new)
-            onActivity?(HUDActivity(kind: .brightness, level: new))
+            let defaults = UserDefaults.standard
+            onActivity?(HUDActivity(kind: .brightness, level: new,
+                                    duration: defaults.double(forKey: SettingsKey.brightnessHUDDuration),
+                                    showsPercentage: defaults.bool(forKey: SettingsKey.brightnessShowsPercentage)))
         }
     }
 
     private func showVolume(level: Float, isMuted: Bool) {
-        let showsDevice = UserDefaults.standard.bool(forKey: SettingsKey.hudShowsOutputDevice)
+        let defaults = UserDefaults.standard
+        let showsDevice = defaults.bool(forKey: SettingsKey.hudShowsOutputDevice)
         onActivity?(HUDActivity(kind: .volume, level: level, isMuted: isMuted,
-                                deviceName: showsDevice ? AudioOutput.deviceName : nil))
+                                deviceName: showsDevice ? AudioOutput.deviceName : nil,
+                                duration: defaults.double(forKey: SettingsKey.volumeHUDDuration),
+                                showsPercentage: defaults.bool(forKey: SettingsKey.volumeShowsPercentage)))
     }
 }

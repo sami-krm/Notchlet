@@ -27,6 +27,14 @@ enum HUDAnimationSpeed: String, CaseIterable, Identifiable {
         }
     }
 
+    var symbol: String {
+        switch self {
+        case .instant: return "bolt.fill"
+        case .fast: return "hare.fill"
+        case .smooth: return "tortoise.fill"
+        }
+    }
+
     /// `nil` : SwiftUI applique le changement sans animation.
     var animation: Animation? {
         switch self {
@@ -45,21 +53,32 @@ struct HUDActivity: Activity {
     let level: Float
     var isMuted = false
     var deviceName: String?
+    var duration: TimeInterval = 1.5
+    var showsPercentage = false
 
     var id: String { kind == .volume ? "hud.volume" : "hud.brightness" }
-    var displayDuration: TimeInterval { 1.5 }
-    var closedWing: CGFloat { 64 }
+    var displayDuration: TimeInterval { duration }
+    var closedWing: CGFloat { showsPercentage ? 96 : 64 }
 
     var closedView: AnyView {
-        AnyView(
-            HStack {
+        let shownLevel = isMuted ? 0 : level
+        return AnyView(
+            HStack(spacing: 6) {
                 Image(systemName: symbol)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(.white)
                     .frame(width: 26, alignment: .leading)
                 Spacer()
-                HUDBar(level: isMuted ? 0 : level)
-                    .frame(width: 44)
+                HUDBar(kind: kind, level: shownLevel)
+                    .frame(width: showsPercentage ? 30 : 44)
+                if showsPercentage {
+                    Text("\(Int((shownLevel * 100).rounded()))%")
+                        .font(.system(size: 11, weight: .semibold))
+                        .monospacedDigit()
+                        .foregroundStyle(.white)
+                        // Le pourcentage garde sa largeur plutôt que de passer à la ligne.
+                        .fixedSize()
+                }
             }
         )
     }
@@ -96,15 +115,24 @@ struct HUDActivity: Activity {
 
 private struct HUDBar: View {
     let level: Float
-    @AppStorage(SettingsKey.hudBarStyle) private var style = HUDBarStyle.white
-    @AppStorage(SettingsKey.hudAnimationSpeed) private var speed = HUDAnimationSpeed.fast
+    // Chaque HUD a ses propres réglages : les clés dépendent du genre d'activité.
+    @AppStorage private var style: HUDBarStyle
+    @AppStorage private var speed: HUDAnimationSpeed
+
+    init(kind: HUDActivity.Kind, level: Float) {
+        self.level = level
+        _style = AppStorage(wrappedValue: .white,
+                            kind == .volume ? SettingsKey.volumeBarStyle : SettingsKey.brightnessBarStyle)
+        _speed = AppStorage(wrappedValue: .fast,
+                            kind == .volume ? SettingsKey.volumeAnimationSpeed : SettingsKey.brightnessAnimationSpeed)
+    }
 
     var body: some View {
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
                 Capsule().fill(Color.white.opacity(0.2))
                 Capsule()
-                    .fill(style == .accent ? Color.accentColor : Color.white)
+                    .fill(style == .accent ? NotchletStyle.accent : Color.white)
                     .frame(width: proxy.size.width * CGFloat(level))
                     .shadow(color: style == .glow ? .white : .clear, radius: 4)
             }

@@ -40,6 +40,11 @@ final class MediaManager: NSObject, ObservableObject {
     @Published private(set) var artwork: NSImage?
     /// Couleur dominante de la pochette, assez vive pour rester lisible sur fond noir.
     @Published private(set) var accentColor: NSColor?
+    @Published private(set) var isShuffling = false
+    @Published private(set) var isRepeating = false
+
+    /// Appelé quand un nouveau morceau commence.
+    var onTrackChanged: (@MainActor () -> Void)?
 
     private static let players: [String: String] = [
         "com.spotify.client": "Spotify",
@@ -70,7 +75,10 @@ final class MediaManager: NSObject, ObservableObject {
     private func handle(_ info: [AnyHashable: Any]?, bundleID: String) {
         let trackChanged = applyState(info, bundleID: bundleID)
         guard track != nil else { return }
-        if trackChanged { loadArtwork() }
+        if trackChanged {
+            loadArtwork()
+            onTrackChanged?()
+        }
         refreshProgress()
     }
 
@@ -120,6 +128,78 @@ final class MediaManager: NSObject, ObservableObject {
     func playPause() { send("playpause") }
     func next() { send("next track") }
     func previous() { send("previous track") }
+
+    /// Lit les modes de lecture. Les lecteurs ne signalent pas leur changement :
+    /// on les relit à l'ouverture de l'île et après chaque commande.
+    func refreshPlaybackModes() {
+        guard let appName = runningPlayerName else { return }
+        let script = isSpotify
+            ? "tell application \"\(appName)\" to return (shuffling as text) & \"|\" & (repeating as text)"
+            : "tell application \"\(appName)\" to return (shuffle enabled as text) & \"|\" & (song repeat as text)"
+        Task {
+            guard let output = await Self.runAppleScript(script),
+                  let modes = Self.parsePlaybackModes(output)
+            else { return }
+            isShuffling = modes.shuffling
+            isRepeating = modes.repeating
+        }
+    }
+
+    /// Lit "aléatoire|répétition". Musique écrit off, one ou all ; Spotify écrit true ou false.
+    nonisolated static func parsePlaybackModes(_ output: String) -> (shuffling: Bool, repeating: Bool)? {
+        let parts = output.split(separator: "|").map(String.init)
+        guard parts.count == 2 else { return nil }
+        return (parts[0] == "true", parts[1] != "false" && parts[1] != "off")
+    }
+
+    func toggleShuffle() {
+        isShuffling.toggle()
+        sendThenRefreshModes(isSpotify ? "set shuffling to not shuffling"
+                                       : "set shuffle enabled to not shuffle enabled")
+    }
+
+    func toggleRepeat() {
+        isRepeating.toggle()
+        sendThenRefreshModes(isSpotify ? "set repeating to not repeating"
+                                       : "set song repeat to \(isRepeating ? "all" : "off")")
+    }
+
+    private func sendThenRefreshModes(_ command: String) {
+        guard let appName = runningPlayerName else { return }
+        Task {
+            _ = await Self.runAppleScript("tell application \"\(appName)\" to \(command)")
+            refreshPlaybackModes()
+        }
+    }
+
+    /// Copie le lien du morceau pour Spotify. Musique n'expose pas de lien public :
+    /// on copie alors son titre et son artiste.
+    func copyTrackLink() {
+        guard let current = track else { return }
+        guard isSpotify, let appName = runningPlayerName else {
+            Self.copyToPasteboard("\(current.title) — \(current.artist)")
+            return
+        }
+        Task {
+            guard let uri = await Self.runAppleScript("tell application \"\(appName)\" to return spotify url of current track")
+            else { return }
+            Self.copyToPasteboard(Self.shareableSpotifyLink(uri))
+        }
+    }
+
+    /// `spotify:track:abc` devient `https://open.spotify.com/track/abc`.
+    nonisolated static func shareableSpotifyLink(_ uri: String) -> String {
+        let parts = uri.split(separator: ":")
+        guard parts.count == 3, parts[0] == "spotify" else { return uri }
+        return "https://open.spotify.com/\(parts[1])/\(parts[2])"
+    }
+
+    private static func copyToPasteboard(_ text: String) {
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(text, forType: .string)
+    }
+
+    private var isSpotify: Bool { track?.bundleID == "com.spotify.client" }
 
     private func send(_ command: String) {
         guard let appName = runningPlayerName else { return }

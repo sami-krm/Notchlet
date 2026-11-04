@@ -9,6 +9,8 @@ final class NotchViewModel: NSObject, ObservableObject {
     @Published var geometry: NotchGeometry
     /// Activités brèves en attente : la première est affichée, puis retirée à la fin de sa durée.
     @Published private(set) var transientQueue: [any Activity] = []
+    /// Ligne de volume sous les commandes de lecture.
+    @Published var showsVolumeControl = false
 
     let media = MediaManager()
     let battery = BatteryManager()
@@ -18,10 +20,13 @@ final class NotchViewModel: NSObject, ObservableObject {
     // Rayons de la forme (fermée / ouverte)
     let closedTopRadius: CGFloat = 6
     let closedBottomRadius: CGFloat = 10
-    let openTopRadius: CGFloat = 14
+    let openTopRadius: CGFloat = 9
     let openBottomRadius: CGFloat = 26
 
-    let openSize = CGSize(width: 520, height: 180)
+    var openSize: CGSize {
+        // 345 points visibles : la forme retire `openTopRadius` de chaque côté.
+        CGSize(width: 345 + 2 * openTopRadius, height: showsVolumeControl ? 205 : 174)
+    }
 
     /// Hauteur ajoutée sous l'encoche quand l'activité affichée a une ligne en plus.
     let closedFooterHeight: CGFloat = 22
@@ -50,14 +55,22 @@ final class NotchViewModel: NSObject, ObservableObject {
     var displayed: (any Activity)? { transientQueue.first ?? background }
 
     private var background: (any Activity)? {
-        media.track == nil ? nil : MusicActivity(media: media)
+        guard media.track != nil,
+              UserDefaults.standard.string(forKey: SettingsKey.idleActivity) != IdleActivity.none.rawValue
+        else { return nil }
+        return MusicActivity(media: media)
     }
 
     /// Branche les alertes de batterie sur la file. Séparé de `init` pour que les tests
     /// ne déclenchent ni alerte ni son selon l'état réel de la batterie.
     func startBatteryAlerts() {
         battery.onAlert = { [weak self] alert in
-            self?.enqueue(BatteryAlertActivity(alert: alert))
+            let defaults = UserDefaults.standard
+            self?.enqueue(BatteryAlertActivity(
+                alert: alert,
+                duration: defaults.double(forKey: SettingsKey.batteryAlertDuration),
+                showsPercentage: !defaults.bool(forKey: SettingsKey.batteryHidesPercentage)
+            ))
         }
         battery.update()
     }

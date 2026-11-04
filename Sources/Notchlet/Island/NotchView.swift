@@ -40,6 +40,7 @@ struct NotchView: View {
         .animation(spring, value: media.track)
         .animation(spring, value: vm.displayed?.id)
         .animation(spring, value: vm.geometry)
+        .animation(spring, value: vm.showsVolumeControl)
     }
 
     // MARK: - Fermée : "live activity" de chaque côté de l'encoche
@@ -63,85 +64,60 @@ struct NotchView: View {
     // MARK: - Ouverte
 
     private var openContent: some View {
-        VStack(spacing: 14) {
-            // Ligne du haut : à gauche et à droite de l'encoche physique
-            HStack {
-                // Île ouverte, une activité brève prend la place de la date. Largeur limitée :
-                // au-delà, elle passerait sous l'encoche.
-                if let brief = vm.transientQueue.first {
-                    brief.closedView.frame(width: 110)
-                } else {
+        Group {
+            if media.track == nil {
+                idleOpenContent
+            } else {
+                MusicOpenView(vm: vm, media: media)
+            }
+        }
+        // Une activité brève s'affiche juste sous l'encoche : à côté, la place manque.
+        .overlay(alignment: .topTrailing) {
+            if let brief = vm.transientQueue.first {
+                brief.closedView
+                    .frame(width: 98, height: 28)
+                    .padding(.horizontal, 6)
+                    .background(RoundedRectangle(cornerRadius: 9).fill(Color.black.opacity(0.85)))
+                    .padding(.top, vm.geometry.notchSize.height + 2)
+                    // La forme de l'île retire `openTopRadius` de chaque côté.
+                    .padding(.trailing, vm.openTopRadius + 6)
+            }
+        }
+    }
+
+    /// Sans musique : l'heure, la date et la batterie, sous l'encoche.
+    private var idleOpenContent: some View {
+        VStack(spacing: 6) {
+            Spacer(minLength: vm.geometry.notchSize.height)
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 2) {
+                    ClockView()
                     Text(Date.now, format: .dateTime.weekday(.wide).day().month(.wide))
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(.white.opacity(0.7))
                 }
                 Spacer()
-                BatteryView(battery: battery)
+                VStack(alignment: .trailing, spacing: 10) {
+                    BatteryView(battery: battery)
+                    Text("Lance Spotify ou Musique")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.white.opacity(0.5))
+                        .lineLimit(1)
+                }
             }
-            .frame(height: vm.geometry.notchSize.height)
-
-            HStack(spacing: 16) {
-                MediaCard(media: media)
-                Divider().overlay(Color.white.opacity(0.15))
-                ClockView()
-            }
-            .frame(maxHeight: .infinity)
+            Spacer(minLength: 0)
         }
-        .padding(.horizontal, vm.openTopRadius + 20)
-        .padding(.bottom, 18)
+        .padding(.horizontal, 18 + vm.openTopRadius)
+        .padding(.bottom, 14)
     }
 }
 
 // MARK: - Composants
 
-struct MediaCard: View {
-    @ObservedObject var media: MediaManager
-    @AppStorage(SettingsKey.musicColorStyle) private var style = MusicColorStyle.artwork
-
-    var body: some View {
-        HStack(spacing: 12) {
-            if let track = media.track {
-                ArtworkImage(media: media, size: 76, cornerRadius: 10)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(track.title)
-                        .font(.system(size: 14, weight: .semibold))
-                        .lineLimit(1)
-                    Text(track.artist)
-                        .font(.system(size: 12))
-                        .foregroundStyle(.white.opacity(0.6))
-                        .lineLimit(1)
-
-                    HStack(spacing: 18) {
-                        ControlButton(symbol: "backward.fill") { media.previous() }
-                        ControlButton(symbol: media.isPlaying ? "pause.fill" : "play.fill", size: 18) { media.playPause() }
-                        ControlButton(symbol: "forward.fill") { media.next() }
-                    }
-
-                    if let progress = media.progress {
-                        TrackProgressBar(progress: progress, isPlaying: media.isPlaying,
-                                         color: style.accent(from: media.accentColor),
-                                         onSeek: { media.seek(to: $0) })
-                    }
-                }
-                Spacer(minLength: 0)
-            } else {
-                Image(systemName: "music.note")
-                    .font(.system(size: 22))
-                    .foregroundStyle(.white.opacity(0.4))
-                Text("Lance Spotify ou Musique")
-                    .font(.system(size: 13))
-                    .foregroundStyle(.white.opacity(0.5))
-                Spacer(minLength: 0)
-            }
-        }
-        .frame(maxWidth: .infinity)
-    }
-}
-
 struct ControlButton: View {
     let symbol: String
     var size: CGFloat = 14
+    var isActive = false
     let action: () -> Void
     @State private var hovering = false
 
@@ -149,8 +125,13 @@ struct ControlButton: View {
         Button(action: action) {
             Image(systemName: symbol)
                 .font(.system(size: size, weight: .semibold))
-                .frame(width: 26, height: 26)
-                .background(Circle().fill(Color.white.opacity(hovering ? 0.15 : 0)))
+                .foregroundStyle(isActive ? NotchletStyle.accent : Color.white)
+                .frame(width: 44, height: 40)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.white.opacity(hovering || isActive ? 0.12 : 0))
+                )
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .onHover { hovering = $0 }
@@ -164,18 +145,20 @@ struct ClockView: View {
                 .font(.system(size: 34, weight: .semibold, design: .rounded))
                 .monospacedDigit()
         }
-        .frame(width: 110)
     }
 }
 
 struct BatteryView: View {
     @ObservedObject var battery: BatteryManager
+    @AppStorage(SettingsKey.batteryHidesPercentage) private var hidesPercentage = false
 
     var body: some View {
         if let level = battery.level {
             HStack(spacing: 5) {
-                Text("\(level)%")
-                    .font(.system(size: 12, weight: .medium))
+                if !hidesPercentage {
+                    Text("\(level)%")
+                        .font(.system(size: 12, weight: .medium))
+                }
                 Image(systemName: symbol(for: level))
                     .font(.system(size: 14))
                     .foregroundStyle(color(for: level))

@@ -26,7 +26,13 @@ final class SettingsWindowController {
     private func makeWindow() -> NSWindow {
         let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(hud: hud, bluetooth: bluetooth)))
         window.title = "Réglages de Notchlet"
-        window.styleMask = [.titled, .closable]
+        // Le contenu monte sous la barre de titre, devenue invisible : seuls restent les
+        // boutons de fenêtre, au-dessus de la barre latérale.
+        window.styleMask = [.titled, .closable, .fullSizeContentView]
+        window.titlebarAppearsTransparent = true
+        window.titleVisibility = .hidden
+        window.isMovableByWindowBackground = true
+        window.appearance = NSAppearance(named: .darkAqua)
         // La fenêtre fermée reste en mémoire pour être rouverte.
         window.isReleasedWhenClosed = false
         window.center()

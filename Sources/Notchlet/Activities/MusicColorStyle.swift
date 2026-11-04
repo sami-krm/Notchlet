@@ -21,6 +21,29 @@ enum MusicColorStyle: String, CaseIterable, Identifiable {
     }
 }
 
+/// Bouton placé à gauche des commandes de lecture.
+enum MusicSideButton: String, CaseIterable, Identifiable {
+    case shuffle, repeatTrack, copyLink
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .shuffle: return "Aléatoire"
+        case .repeatTrack: return "Répétition"
+        case .copyLink: return "Copier le lien"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .shuffle: return "shuffle"
+        case .repeatTrack: return "repeat"
+        case .copyLink: return "link"
+        }
+    }
+}
+
 /// Pochette du morceau, ou icône de l'app quand elle n'est pas disponible.
 struct ArtworkImage: View {
     @ObservedObject var media: MediaManager

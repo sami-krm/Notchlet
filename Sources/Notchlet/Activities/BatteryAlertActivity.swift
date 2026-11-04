@@ -3,6 +3,10 @@ import SwiftUI
 /// Activité brève : le Mac vient d'être branché, ou sa batterie est faible.
 struct BatteryAlertActivity: Activity {
     let alert: BatteryAlert
+    var duration: TimeInterval = 3
+    var showsPercentage = true
+
+    var displayDuration: TimeInterval { duration }
 
     var id: String {
         switch alert {
@@ -32,10 +36,12 @@ struct BatteryAlertActivity: Activity {
                     .symbolRenderingMode(.monochrome)
                     .foregroundStyle(color)
                 Spacer()
-                Text("\(level)%")
-                    .font(.system(size: 12, weight: .semibold))
-                    .monospacedDigit()
-                    .foregroundStyle(color)
+                if showsPercentage {
+                    Text("\(level)%")
+                        .font(.system(size: 12, weight: .semibold))
+                        .monospacedDigit()
+                        .foregroundStyle(color)
+                }
             }
         )
     }

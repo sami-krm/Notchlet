@@ -29,7 +29,8 @@ Sources/Notchlet/
   Island/
     NotchViewModel.swift        État de l'île, tailles, rayons, file d'activités
     NotchShape.swift            Forme animable de l'île
-    NotchView.swift             Interface SwiftUI
+    NotchView.swift             Interface SwiftUI de l'île
+    MusicOpenView.swift         Île ouverte avec musique, commandes, ligne de volume
   Activities/
     Activity.swift              Protocole commun des activités
     MusicActivity.swift         Morceau en cours dans l'île fermée, barre de progression
@@ -48,10 +49,12 @@ Sources/Notchlet/
     DisplayBrightness.swift     Luminosité (API privée DisplayServices, chargée avec dlopen)
   SettingsUI/
     SettingsWindowController.swift Fenêtre de réglages (NSWindow)
-    SettingsView.swift          Onglets Général, HUD, Lecture en cours, Batterie, Bluetooth et À propos
+    SettingsView.swift          Barre latérale et rubriques (Général, Batterie, Appareils, Luminosité, Volume, Lecture en cours, À propos)
+    SettingsComponents.swift    Cartes, lignes, curseurs, tuiles de choix, couleur d'accent
 Tests/NotchletTests/        Tests unitaires
 ```
-`Private/` regroupe le code des API privées : chaque fonction est désactivable et laisse macOS reprendre la main si l'API disparaît. Un onglet de réglages s'ajoute avec la fonctionnalité qu'il règle.
+`Private/` regroupe le code des API privées : chaque fonction est désactivable et laisse macOS reprendre la main si l'API disparaît. Une rubrique ou un réglage ne s'ajoute qu'avec la fonctionnalité qu'il règle : pas d'interrupteur sans effet.
+Design : même organisation qu'Alcove (barre latérale, cartes, tuiles, île centrée sur la musique), mais identité propre : textes en français, symboles Apple, accent ambre (`NotchletStyle.accent`). Seule la taille de l'île ouverte reprend, à ma demande, celle mesurée sur Alcove (345 × 174 points, 205 avec le volume). Aucune ressource d'Alcove.
 La signature de développement est dans `Config/Signing.xcconfig` (ad hoc par défaut). Le certificat et l'identifiant d'équipe restent dans `Config/Signing.local.xcconfig`, ignoré par Git : ils ne doivent pas arriver dans le dépôt public.
 Règles :
 - **Un fichier par service** (`CalendarManager`, `HUDManager`, `BluetoothManager`…), chacun en `ObservableObject` avec des propriétés `@Published`.

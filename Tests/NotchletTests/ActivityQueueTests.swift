@@ -19,6 +19,11 @@ final class ActivityQueueTests: XCTestCase {
     }
 
     func testBriefActivityReplacesMusicThenMusicComesBack() {
+        // Le test ne doit pas dépendre du réglage « Au repos » de ce Mac.
+        let saved = UserDefaults.standard.string(forKey: SettingsKey.idleActivity)
+        UserDefaults.standard.set(IdleActivity.music.rawValue, forKey: SettingsKey.idleActivity)
+        defer { UserDefaults.standard.set(saved, forKey: SettingsKey.idleActivity) }
+
         let vm = makeViewModel()
         vm.media.applyState(["Player State": "Playing", "Name": "Titre"], bundleID: "com.spotify.client")
         XCTAssertEqual(vm.displayed?.id, "music")

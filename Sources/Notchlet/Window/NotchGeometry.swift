@@ -6,6 +6,15 @@ struct NotchGeometry: Equatable {
     var hasNotch: Bool
 
     static func from(_ screen: NSScreen) -> NotchGeometry {
+        var geometry = detected(on: screen)
+        // Réglage « Ajustement de l'encoche ».
+        let defaults = UserDefaults.standard
+        geometry.notchSize.width += defaults.double(forKey: SettingsKey.notchWidthOffset)
+        geometry.notchSize.height += defaults.double(forKey: SettingsKey.notchHeightOffset)
+        return geometry
+    }
+
+    private static func detected(on screen: NSScreen) -> NotchGeometry {
         // Sur les MacBook à encoche, safeAreaInsets.top > 0 et les zones
         // auxiliaires gauche/droite encadrent l'encoche.
         if screen.safeAreaInsets.top > 0,

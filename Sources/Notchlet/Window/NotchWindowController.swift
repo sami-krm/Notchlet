@@ -23,6 +23,8 @@ final class NotchWindowController: NSObject {
     /// rouvrirait l'île aussitôt.
     private var hoverBlocked = false
     private var scrollMonitors: [Any] = []
+    /// Jusqu'à cette date, l'île reste ouverte même sans la souris (aperçu rapide).
+    private var peekEnd = Date.distantPast
 
     override init() {
         screen = NotchGeometry.targetScreen()
@@ -72,6 +74,7 @@ final class NotchWindowController: NSObject {
         viewModel.startBatteryAlerts()
         viewModel.startHUD()
         viewModel.startBluetooth()
+        viewModel.media.onTrackChanged = { [weak self] in self?.showQuickPeek() }
     }
 
     var hud: HUDManager { viewModel.hud }
@@ -118,17 +121,37 @@ final class NotchWindowController: NSObject {
         guard panel.isOnActiveSpace else { return }
         let isInZone = activeZone.contains(NSEvent.mouseLocation)
 
+        let defaults = UserDefaults.standard
+
         switch viewModel.state {
         case .closed:
             if !isInZone { hoverBlocked = false }
-            let delay = UserDefaults.standard.double(forKey: SettingsKey.hoverDelay)
-            if hoverTimer.update(isInside: isInZone && !hoverBlocked, now: Date(), delay: delay) {
+            let canHover = isInZone && !hoverBlocked && defaults.bool(forKey: SettingsKey.expandOnHover)
+            let delay = defaults.double(forKey: SettingsKey.hoverDelay)
+            if hoverTimer.update(isInside: canHover, now: Date(), delay: delay) {
                 setState(.open)
+                playHaptic()
             }
 
         case .open:
-            if !isInZone { setState(.closed) }
+            if !isInZone && Date() >= peekEnd { setState(.closed) }
         }
+    }
+
+    /// Ouvre l'île quelques secondes quand le morceau change.
+    private func showQuickPeek() {
+        let defaults = UserDefaults.standard
+        guard defaults.bool(forKey: SettingsKey.quickPeekEnabled),
+              viewModel.state == .closed, panel.isOnActiveSpace
+        else { return }
+        peekEnd = Date().addingTimeInterval(defaults.double(forKey: SettingsKey.quickPeekDuration))
+        setState(.open)
+    }
+
+    /// Une petite vibration du trackpad, sur les Mac qui en sont équipés.
+    private func playHaptic() {
+        guard UserDefaults.standard.bool(forKey: SettingsKey.hapticFeedback) else { return }
+        NSHapticFeedbackManager.defaultPerformer.perform(.alignment, performanceTime: .now)
     }
 
     /// Zone où la souris agit sur l'île : un peu plus large que l'île elle-même.
@@ -156,7 +179,12 @@ final class NotchWindowController: NSObject {
             viewModel.state = newState
         }
         panel.ignoresMouseEvents = (newState == .closed)
-        if newState == .open { viewModel.media.refreshProgress() }
+        if newState == .open {
+            viewModel.media.refreshProgress()
+            viewModel.media.refreshPlaybackModes()
+        } else {
+            viewModel.showsVolumeControl = false
+        }
     }
 
     // MARK: - Gestes au trackpad
@@ -184,20 +212,29 @@ final class NotchWindowController: NSObject {
             swipe = activeZone.contains(NSEvent.mouseLocation) ? SwipeDetector() : nil
         }
         // Avec le défilement naturel, le signe des valeurs suit les doigts ; sinon il est inversé.
-        let sign: CGFloat = event.isDirectionInvertedFromDevice ? 1 : -1
+        let defaults = UserDefaults.standard
+        let deviceSign: CGFloat = event.isDirectionInvertedFromDevice ? 1 : -1
+        let sign = defaults.bool(forKey: SettingsKey.naturalMovement) ? -deviceSign : deviceSign
         let detected = swipe?.update(fingerX: event.scrollingDeltaX * sign,
                                      fingerY: event.scrollingDeltaY * sign)
+        let canToggle = defaults.bool(forKey: SettingsKey.swipeToOpen)
+        let canSkip = defaults.bool(forKey: SettingsKey.swipeToSkip)
         switch detected {
-        case .down:
+        case .down where canToggle:
             setState(.open)
-        case .up:
+            playHaptic()
+        case .up where canToggle:
             hoverBlocked = true
+            peekEnd = .distantPast
             setState(.closed)
-        case .left:
+            playHaptic()
+        case .left where canSkip:
             viewModel.media.next()
-        case .right:
+            playHaptic()
+        case .right where canSkip:
             viewModel.media.previous()
-        case nil:
+            playHaptic()
+        default:
             break
         }
     }

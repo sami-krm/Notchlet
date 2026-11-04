@@ -159,7 +159,8 @@ final class BluetoothManager: NSObject, ObservableObject {
         Task {
             let report = await Self.waitForReport(address: address)
             onActivity?(BluetoothActivity(deviceName: name, battery: report?.battery ?? BluetoothBattery(),
-                                          minorType: report?.minorType))
+                                          minorType: report?.minorType,
+                                          duration: UserDefaults.standard.double(forKey: SettingsKey.bluetoothAlertDuration)))
         }
     }
 
