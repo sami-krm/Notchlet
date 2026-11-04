@@ -13,6 +13,7 @@ final class NotchViewModel: NSObject, ObservableObject {
     let media = MediaManager()
     let battery = BatteryManager()
     let hud = HUDManager()
+    let bluetooth = BluetoothManager()
 
     // Rayons de la forme (fermée / ouverte)
     let closedTopRadius: CGFloat = 6
@@ -66,6 +67,13 @@ final class NotchViewModel: NSObject, ObservableObject {
             self?.showImmediately(activity)
         }
         hud.start()
+    }
+
+    func startBluetooth() {
+        bluetooth.onActivity = { [weak self] activity in
+            self?.enqueue(activity)
+        }
+        bluetooth.start()
     }
 
     /// Affiche l'activité tout de suite, sans attendre la file : un HUD doit répondre à

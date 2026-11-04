@@ -6,10 +6,12 @@ import SwiftUI
 @MainActor
 final class SettingsWindowController {
     private let hud: HUDManager
+    private let bluetooth: BluetoothManager
     private var window: NSWindow?
 
-    init(hud: HUDManager) {
+    init(hud: HUDManager, bluetooth: BluetoothManager) {
         self.hud = hud
+        self.bluetooth = bluetooth
     }
 
     func show() {
@@ -22,7 +24,7 @@ final class SettingsWindowController {
     }
 
     private func makeWindow() -> NSWindow {
-        let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(hud: hud)))
+        let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(hud: hud, bluetooth: bluetooth)))
         window.title = "Réglages de DynamicNotch"
         window.styleMask = [.titled, .closable]
         // La fenêtre fermée reste en mémoire pour être rouverte.

@@ -18,6 +18,8 @@ enum SettingsKey {
     static let hudBarStyle = "hudBarStyle"
     static let hudAnimationSpeed = "hudAnimationSpeed"
     static let hudShowsOutputDevice = "hudShowsOutputDevice"
+    /// Désactivé par défaut : l'activer déclenche la demande de permission Bluetooth.
+    static let bluetoothAlertsEnabled = "bluetoothAlertsEnabled"
 
     /// Valeurs utilisées tant que l'utilisateur n'a rien changé.
     static let defaults: [String: Any] = [
@@ -34,5 +36,6 @@ enum SettingsKey {
         hudBarStyle: HUDBarStyle.white.rawValue,
         hudAnimationSpeed: HUDAnimationSpeed.fast.rawValue,
         hudShowsOutputDevice: true,
+        bluetoothAlertsEnabled: false,
     ]
 }

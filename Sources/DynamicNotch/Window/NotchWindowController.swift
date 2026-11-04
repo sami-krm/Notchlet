@@ -71,9 +71,11 @@ final class NotchWindowController: NSObject {
         startSwipeTracking()
         viewModel.startBatteryAlerts()
         viewModel.startHUD()
+        viewModel.startBluetooth()
     }
 
     var hud: HUDManager { viewModel.hud }
+    var bluetooth: BluetoothManager { viewModel.bluetooth }
 
     @objc private func applySettings() {
         // Sans `.fullScreenAuxiliary`, macOS n'affiche pas la fenêtre dans les espaces plein écran.

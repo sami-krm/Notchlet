@@ -300,6 +300,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "DynamicNotch contrôle la lecture de Spotify et de Musique depuis l'île.";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "DynamicNotch affiche dans l'île les appareils Bluetooth qui se connectent, avec leur batterie.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -321,6 +322,7 @@
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSAppleEventsUsageDescription = "DynamicNotch contrôle la lecture de Spotify et de Musique depuis l'île.";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "DynamicNotch affiche dans l'île les appareils Bluetooth qui se connectent, avec leur batterie.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

@@ -36,17 +36,19 @@ Sources/DynamicNotch/
     MusicColorStyle.swift       Styles de couleur, pochette et fond de l'île
     BatteryAlertActivity.swift  Alertes de charge et de batterie faible
     HUDActivity.swift           HUD volume et luminosité, styles de barre, vitesse d'animation
+    BluetoothActivity.swift     Connexion d'un appareil Bluetooth
   Managers/
     MediaManager.swift          Musique (notifications Spotify/Musique, AppleScript via osascript, hors du thread principal)
     BatteryManager.swift        Batterie (IOKit, notifications d'alimentation), décision des alertes
     LaunchAtLoginManager.swift  Lancement à l'ouverture de session (SMAppService)
     HUDManager.swift            Touches média (CGEventTap, permission Accessibilité)
     AudioOutput.swift           Volume et sortie audio (Core Audio)
+    BluetoothManager.swift      Connexions (IOBluetooth, permission Bluetooth), batterie (system_profiler)
   Private/
     DisplayBrightness.swift     Luminosité (API privée DisplayServices, chargée avec dlopen)
   SettingsUI/
     SettingsWindowController.swift Fenêtre de réglages (NSWindow)
-    SettingsView.swift          Onglets Général, HUD, Lecture en cours, Batterie et À propos
+    SettingsView.swift          Onglets Général, HUD, Lecture en cours, Batterie, Bluetooth et À propos
 Tests/DynamicNotchTests/        Tests unitaires
 ```
 `Private/` regroupe le code des API privées : chaque fonction est désactivable et laisse macOS reprendre la main si l'API disparaît. Un onglet de réglages s'ajoute avec la fonctionnalité qu'il règle.

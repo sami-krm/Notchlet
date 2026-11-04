@@ -12,6 +12,7 @@ Une « Dynamic Island » pour Mac, en Swift, SwiftUI et AppKit. Ce projet person
 - **Gestes au trackpad**, à deux doigts sur l'île : vers le bas pour ouvrir, vers le haut pour fermer, vers la gauche pour le morceau suivant, vers la droite pour le précédent.
 - **Alertes de batterie** : quelques secondes dans l'île au branchement du chargeur et quand la batterie passe sous le seuil, avec un son (ceux de macOS). L'alerte s'affiche à la place de la musique, qui revient ensuite. Île ouverte, elle prend la place de la date.
 - **HUD volume et luminosité** (à activer dans l'onglet HUD) : remplace les HUD de macOS par une jauge dans l'île, avec le nom de la sortie audio. Avec Maj, Option, Contrôle ou Commande, les touches restent gérées par macOS.
+- **Appareils Bluetooth** (à activer dans l'onglet Bluetooth) : à la connexion, l'île affiche l'icône de l'appareil avec un petit rebond, son nom et sa batterie. Pour des écouteurs, c'est le niveau le plus faible des deux.
 - Une icône dans la barre des menus donne accès aux réglages et permet de quitter l'app.
 
 ## Réglages
@@ -32,10 +33,11 @@ Ouvre-les depuis l'icône de la barre des menus, avec **Réglages…**.
 |---|---|---|
 | Automatisation | Lire la pochette et la position, et contrôler Spotify ou Musique | Réglages Système > Confidentialité et sécurité > Automatisation |
 | Accessibilité | Intercepter les touches de volume et de luminosité pour le HUD | Réglages Système > Confidentialité et sécurité > Accessibilité |
+| Bluetooth | Détecter la connexion des appareils | Réglages Système > Confidentialité et sécurité > Bluetooth |
 
 macOS la demande dès le premier morceau détecté. Sans elle, l'île affiche l'icône de l'app au lieu de la pochette, sans barre de progression, et les boutons restent sans effet.
 
-L'Accessibilité n'est demandée que lorsque tu actives le HUD. Les gestes et les alertes de batterie ne demandent aucune permission.
+L'Accessibilité n'est demandée que lorsque tu actives le HUD, et le Bluetooth lorsque tu actives son onglet. La batterie des appareils vient de l'outil système `system_profiler`, sans API privée, mais son format n'est pas documenté. Les gestes et les alertes de batterie ne demandent aucune permission.
 
 **API privée :** le HUD de luminosité utilise DisplayServices, une API non documentée d'Apple (voir `Sources/DynamicNotch/Private`). Si une mise à jour de macOS la retire, ces touches reviennent à macOS. Pour Spotify, la pochette est téléchargée depuis l'adresse HTTPS fournie par l'app.
 
@@ -62,7 +64,7 @@ Le projet compile sans compte Apple, avec une signature ad hoc, mais macOS peut 
 | `Sources/DynamicNotch/Window` | Fenêtre transparente, survol, taille de l'encoche |
 | `Sources/DynamicNotch/Island` | État, forme et interface de l'île |
 | `Sources/DynamicNotch/Activities` | Protocole `Activity` et activités affichées dans l'île |
-| `Sources/DynamicNotch/Managers` | Accès au système : musique, batterie, HUD, sortie audio, lancement à l'ouverture de session |
+| `Sources/DynamicNotch/Managers` | Accès au système : musique, batterie, HUD, sortie audio, Bluetooth, lancement à l'ouverture de session |
 | `Sources/DynamicNotch/Private` | Code qui dépend d'API privées d'Apple |
 | `Sources/DynamicNotch/SettingsUI` | Fenêtre et onglets de réglages |
 | `Tests/DynamicNotchTests` | Tests unitaires |

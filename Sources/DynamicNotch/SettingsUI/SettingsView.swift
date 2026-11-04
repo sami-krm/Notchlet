@@ -3,6 +3,7 @@ import SwiftUI
 /// Les autres onglets arriveront avec leurs fonctionnalités.
 struct SettingsView: View {
     let hud: HUDManager
+    let bluetooth: BluetoothManager
 
     var body: some View {
         TabView {
@@ -14,10 +15,12 @@ struct SettingsView: View {
                 .tabItem { Label("Lecture en cours", systemImage: "music.note") }
             BatterySettingsView()
                 .tabItem { Label("Batterie", systemImage: "battery.75") }
+            BluetoothSettingsView(bluetooth: bluetooth)
+                .tabItem { Label("Bluetooth", systemImage: "airpodspro") }
             AboutView()
                 .tabItem { Label("À propos", systemImage: "info.circle") }
         }
-        .frame(width: 460, height: 340)
+        .frame(width: 540, height: 340)
     }
 }
 
@@ -145,6 +148,31 @@ private struct BatterySettingsView: View {
                 .disabled(!lowAlertEnabled)
                 Toggle("Jouer un son", isOn: $soundEnabled)
                     .disabled(!lowAlertEnabled)
+            }
+        }
+        .formStyle(.grouped)
+    }
+}
+
+private struct BluetoothSettingsView: View {
+    @ObservedObject var bluetooth: BluetoothManager
+    @AppStorage(SettingsKey.bluetoothAlertsEnabled) private var isEnabled = false
+
+    var body: some View {
+        Form {
+            Section {
+                Toggle("Signaler la connexion des appareils", isOn: $isEnabled)
+                    .onChange(of: isEnabled) { enabled in
+                        if enabled && bluetooth.authorization == .notDetermined { bluetooth.requestPermission() }
+                    }
+                if isEnabled && (bluetooth.authorization == .denied || bluetooth.authorization == .restricted) {
+                    Text("Autorise DynamicNotch dans Réglages Système > Confidentialité et sécurité > Bluetooth.")
+                        .foregroundStyle(.secondary)
+                    Button("Ouvrir Réglages Système") { bluetooth.openPermissionSettings() }
+                }
+            } footer: {
+                Text("L'île affiche l'appareil et sa batterie. Pour des écouteurs, c'est le niveau le plus faible des deux.")
+                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
