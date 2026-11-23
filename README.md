@@ -1,6 +1,40 @@
-# Notchlet
+<p align="center">
+  <img src="Sources/Notchlet/Assets.xcassets/AppIcon.appiconset/icon_256.png" alt="Logo Notchlet" width="128">
+</p>
 
-Une « Dynamic Island » pour Mac, en Swift, SwiftUI et AppKit. Ce projet personnel est inspiré d'Alcove, sans en reprendre le code ni les ressources.
+<h1 align="center">Notchlet</h1>
+
+<p align="center">
+  <strong>Une « Dynamic Island » pour Mac, posée sur l'encoche.</strong><br>
+  Musique, batterie, HUD, calendrier, appareils Bluetooth et étagère de fichiers, en Swift, SwiftUI et AppKit.
+</p>
+
+<p align="center">
+  <img alt="macOS 13+" src="https://img.shields.io/badge/macOS-13%2B-000000?logo=apple&logoColor=white">
+  <img alt="Swift" src="https://img.shields.io/badge/Swift-5-F05138?logo=swift&logoColor=white">
+  <img alt="SwiftUI" src="https://img.shields.io/badge/SwiftUI-AppKit-0D96F6?logo=swift&logoColor=white">
+  <a href="https://github.com/sami-krm/Notchlet/releases"><img alt="Release" src="https://img.shields.io/github/v/release/sami-krm/Notchlet?include_prereleases&label=release"></a>
+  <a href="LICENSE"><img alt="Licence MIT" src="https://img.shields.io/badge/licence-MIT-green"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/sami-krm/Notchlet/releases"><strong>⬇️ Télécharger la dernière version</strong></a>
+</p>
+
+> Projet personnel inspiré d'Alcove, sans en reprendre le code ni les ressources.
+
+---
+
+## Sommaire
+
+- [Installation](#installation)
+- [Ce que fait l'app](#ce-que-fait-lapp)
+- [Réglages](#réglages)
+- [Permissions](#permissions)
+- [Lancer le projet](#lancer-le-projet)
+- [Organisation du code](#organisation-du-code)
+- [Construire le paquet](#construire-le-paquet)
+- [Licence](#licence)
 
 ## Installation
 
