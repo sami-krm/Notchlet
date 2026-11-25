@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <img src="docs/apercu.png" alt="Notchlet en action : musique, volume et luminosité, écouteurs et batterie, prochaine réunion" width="100%">
+  <img src="docs/apercu.png" alt="Captures de Notchlet : lecteur de musique, étagère de fichiers et calendrier dans l'encoche" width="100%">
 </p>
 
 <p align="center">
