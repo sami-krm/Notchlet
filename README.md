@@ -10,6 +10,10 @@
 </p>
 
 <p align="center">
+  <img src="docs/apercu.png" alt="Notchlet en action : musique, volume et luminosité, écouteurs et batterie, prochaine réunion" width="100%">
+</p>
+
+<p align="center">
   <img alt="macOS 13+" src="https://img.shields.io/badge/macOS-13%2B-000000?logo=apple&logoColor=white">
   <img alt="Swift" src="https://img.shields.io/badge/Swift-5-F05138?logo=swift&logoColor=white">
   <img alt="SwiftUI" src="https://img.shields.io/badge/SwiftUI-AppKit-0D96F6?logo=swift&logoColor=white">
